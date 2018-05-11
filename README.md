@@ -1,6 +1,6 @@
-# Gladiatorcheatz-Public
+# Gladiatorcheatz-v2.1
 -------------------------------
-#### Public release of Gladiatorcheatz
+#### Public release of Gladiatorcheatz v2.1
 
 -------------------------------
 
