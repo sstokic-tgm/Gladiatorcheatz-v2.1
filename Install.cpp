@@ -57,7 +57,7 @@ std::unique_ptr<ShadowVTManager> g_pClientModeHook = nullptr;
 std::unique_ptr<ShadowVTManager> g_pVguiSurfHook = nullptr;
 std::unique_ptr<ShadowVTManager> g_pD3DDevHook = nullptr;
 std::unique_ptr<ShadowVTManager> g_pClientHook = nullptr;
-std::unique_ptr<ShadowVTManager> g_pGameEventManagerHook = nullptr;
+//std::unique_ptr<ShadowVTManager> g_pGameEventManagerHook = nullptr;
 std::unique_ptr<ShadowVTManager> g_pMaterialSystemHook = nullptr;
 std::unique_ptr<ShadowVTManager> g_pDMEHook = nullptr;
 std::unique_ptr<ShadowVTManager> g_pInputInternalHook = nullptr;
@@ -92,6 +92,8 @@ SendDatagram_t o_SendDatagram = nullptr;
 WriteUsercmdDeltaToBuffer_t o_WriteUsercmdDeltaToBuffer = nullptr;
 IsBoxVisible_t o_IsBoxVisible = nullptr;
 IsHLTV_t o_IsHLTV = nullptr;
+CusorFunc_t o_LockCursor = nullptr;
+CusorFunc_t o_UnlockCursor = nullptr;
 
 RecvVarProxyFn o_didSmokeEffect = nullptr;
 RecvVarProxyFn o_nSequence = nullptr;
@@ -113,10 +115,10 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	Utils::ConsolePrint(true, "-= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -= -\n");
 	Utils::ConsolePrint(true, "Initializing cheat...\n");
 
-	g_CHLClient = Iface::IfaceMngr::getIface<IBaseClientDLL>("client.dll", "VClient0");
-	g_EntityList = Iface::IfaceMngr::getIface<IClientEntityList>("client.dll", "VClientEntityList");
-	g_Prediction = Iface::IfaceMngr::getIface<IPrediction>("client.dll", "VClientPrediction");
-	g_GameMovement = Iface::IfaceMngr::getIface<CGameMovement>("client.dll", "GameMovement");
+	g_CHLClient = Iface::IfaceMngr::getIface<IBaseClientDLL>("client_panorama.dll", "VClient0");
+	g_EntityList = Iface::IfaceMngr::getIface<IClientEntityList>("client_panorama.dll", "VClientEntityList");
+	g_Prediction = Iface::IfaceMngr::getIface<IPrediction>("client_panorama.dll", "VClientPrediction");
+	g_GameMovement = Iface::IfaceMngr::getIface<CGameMovement>("client_panorama.dll", "GameMovement");
 	g_MdlCache = Iface::IfaceMngr::getIface<IMDLCache>("datacache.dll", "MDLCache");
 	g_EngineClient = Iface::IfaceMngr::getIface<IVEngineClient>("engine.dll", "VEngineClient");
 	g_MdlInfo = Iface::IfaceMngr::getIface<IVModelInfoClient>("engine.dll", "VModelInfoClient");
@@ -136,11 +138,12 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_Localize = Iface::IfaceMngr::getIface<ILocalize>("localize.dll", "Localize_");
 
 	g_GlobalVars = **(CGlobalVarsBase***)((*(DWORD**)(g_CHLClient))[0] + 0x1B);
-	g_Input = *(CInput**)((*(DWORD**)g_CHLClient)[15] + 0x1);
+	//g_Input = *(CInput**)((*(DWORD**)g_CHLClient)[15] + 0x1);
+	
 	g_ClientMode = **(IClientMode***)((*(DWORD**)g_CHLClient)[10] + 0x5);
 	g_pMemAlloc = *(IMemAlloc**)(GetProcAddress(GetModuleHandle("tier0.dll"), "g_pMemAlloc"));
 
-	auto client = GetModuleHandle("client.dll");
+	auto client = GetModuleHandle("client_panorama.dll");
 	auto engine = GetModuleHandle("engine.dll");
 	auto dx9api = GetModuleHandle("shaderapidx9.dll");
 
@@ -148,6 +151,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_GlowObjManager = *(CGlowObjectManager**)(Utils::PatternScan(client, "0F 11 05 ? ? ? ? 83 C8 01") + 3);
 	g_MoveHelper = **(IMoveHelper***)(Utils::PatternScan(client, "8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01") + 2);
 	g_RenderBeams = *(IViewRenderBeams**)(Utils::PatternScan(client, "A1 ? ? ? ? FF 10 A1 ? ? ? ? B9") + 0x1);
+	g_Input = *(CInput**)(Utils::PatternScan(client, "B9 ? ? ? ? F3 0F 11 04 24 FF 50 10") + 0x1);
 
 	auto D3DDevice9 = **(IDirect3DDevice9***)(Utils::PatternScan(dx9api, "A1 ? ? ? ? 50 8B 08 FF 51 0C") + 1);
 	auto dwFireBullets = *(DWORD**)(Utils::PatternScan(client, "55 8B EC 51 53 56 8B F1 BB ? ? ? ? B8") + 0x131);
@@ -166,7 +170,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pDMEHook = std::make_unique<ShadowVTManager>();
 	g_pD3DDevHook = std::make_unique<ShadowVTManager>();
 	g_pClientHook = std::make_unique<ShadowVTManager>();
-	g_pGameEventManagerHook = std::make_unique<ShadowVTManager>();
+	//g_pGameEventManagerHook = std::make_unique<ShadowVTManager>();
 	g_pSceneEndHook = std::make_unique<ShadowVTManager>();
 	g_pVguiPanelHook = std::make_unique<ShadowVTManager>();
 	g_pVguiSurfHook = std::make_unique<ShadowVTManager>();
@@ -183,7 +187,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pDMEHook->Setup(g_MdlRender);
 	g_pD3DDevHook->Setup(D3DDevice9);
 	g_pClientHook->Setup(g_CHLClient);
-	g_pGameEventManagerHook->Setup(g_GameEvents);
+	//g_pGameEventManagerHook->Setup(g_GameEvents);
 	g_pSceneEndHook->Setup(g_RenderView);
 	g_pVguiPanelHook->Setup(g_VGuiPanel);
 	g_pVguiSurfHook->Setup(g_VGuiSurface);
@@ -204,27 +208,28 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pClientModeHook->Hook(35, Handlers::GetViewModelFov_h);
 	g_pClientModeHook->Hook(18, Handlers::OverrideView_h);
 	g_pClientModeHook->Hook(24, Handlers::CreateMove_h);
-	g_pClientHook->Hook(36, Handlers::FrameStageNotify_h);
-	g_pGameEventManagerHook->Hook(9, Handlers::FireEventClientSide_h);
+	g_pClientHook->Hook(37, Handlers::FrameStageNotify_h);
+	//g_pGameEventManagerHook->Hook(9, Handlers::FireEventClientSide_h);
 	g_pPredictionHook->Hook(14, Handlers::InPrediction_h);
 	g_pPredictionHook->Hook(19, Handlers::RunCommand_h);
 	g_pVguiPanelHook->Hook(41, Handlers::PaintTraverse_h);
 	g_pMaterialSystemHook->Hook(42, Handlers::BeginFrame_h);
 	g_pConvarHook->Hook(13, Handlers::GetBool_SVCheats_h);
 	g_pVguiSurfHook->Hook(82, Handlers::PlaySound_h);
+	g_pVguiSurfHook->Hook(67, Handlers::LockCursor_h);
 	g_pSceneEndHook->Hook(9, Handlers::SceneEnd_h);
 	g_pD3DDevHook->Hook(42, Handlers::EndScene_h);
 	g_pD3DDevHook->Hook(16, Handlers::Reset_h);
 	g_pEngineClientHook->Hook(32, Handlers::IsBoxVisible_h);
-	g_pEngineClientHook->Hook(93, Handlers::IsHLTV_h);
+	g_pEngineClientHook->Hook(94, Handlers::IsHLTV_h);
 
 	o_SetMouseCodeState = g_pInputInternalHook->GetOriginal<SetMouseCodeState_t>(92);
 	o_SetKeyCodeState = g_pInputInternalHook->GetOriginal<SetKeyCodeState_t>(91);
 	o_GetViewmodelFov = g_pClientModeHook->GetOriginal<GetViewmodelFov_t>(35);
 	o_OverrideView = g_pClientModeHook->GetOriginal<OverrideView_t>(18);
 	o_CreateMove = g_pClientModeHook->GetOriginal<CreateMove_t>(24);
-	o_FrameStageNotify = g_pClientHook->GetOriginal<FrameStageNotify_t>(36);
-	o_FireEventClientSide = g_pGameEventManagerHook->GetOriginal<FireEventClientSide_t>(9);
+	o_FrameStageNotify = g_pClientHook->GetOriginal<FrameStageNotify_t>(37);
+	//o_FireEventClientSide = g_pGameEventManagerHook->GetOriginal<FireEventClientSide_t>(9);
 	o_OriginalInPrediction = g_pPredictionHook->GetOriginal<InPrediction_t>(14);
 	o_RunCommand = g_pPredictionHook->GetOriginal<RunCommand_t>(19);
 	o_PaintTraverse = g_pVguiPanelHook->GetOriginal<PaintTraverse_t>(41);
@@ -235,7 +240,9 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	o_EndScene = g_pD3DDevHook->GetOriginal<EndScene_t>(42);
 	o_Reset = g_pD3DDevHook->GetOriginal<Reset_t>(16);
 	o_IsBoxVisible = g_pEngineClientHook->GetOriginal<IsBoxVisible_t>(32);
-	o_IsHLTV = g_pEngineClientHook->GetOriginal<IsHLTV_t>(93);
+	o_IsHLTV = g_pEngineClientHook->GetOriginal<IsHLTV_t>(94);
+	o_UnlockCursor = g_pVguiSurfHook->GetOriginal<CusorFunc_t>(66);
+	o_LockCursor = g_pVguiSurfHook->GetOriginal<CusorFunc_t>(67);
 
 #ifdef INSTANT_DEFUSE_PLANT_EXPLOIT
 	o_WriteUsercmdDeltaToBuffer = g_pClientHook->Hook(23, (WriteUsercmdDeltaToBuffer_t)Handlers::WriteUsercmdDeltaToBuffer_h);
@@ -266,7 +273,7 @@ void Installer::uninstallGladiator()
 	g_pDMEHook->RestoreTable();
 	g_pD3DDevHook->RestoreTable();
 	g_pClientHook->RestoreTable();
-	g_pGameEventManagerHook->RestoreTable();
+	//g_pGameEventManagerHook->RestoreTable();
 	g_pSceneEndHook->RestoreTable();
 	g_pVguiPanelHook->RestoreTable();
 	g_pVguiSurfHook->RestoreTable();

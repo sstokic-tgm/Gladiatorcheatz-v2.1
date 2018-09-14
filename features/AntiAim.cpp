@@ -34,14 +34,14 @@ void AntiAim::Work(CUserCmd *usercmd)
 		if (weapon->CanFirePostPone() && (usercmd->buttons & IN_ATTACK))
 			return;
 	}
-	else if (weapon->GetWeapInfo()->weapon_type == WEAPONTYPE_GRENADE)
+	else if (weapon->GetWeapInfo()->weapon_type() == WEAPONTYPE_GRENADE)
 	{
 		if (weapon->IsInThrow())
 			return;
 	}
 	else
 	{
-		if (weapon->GetWeapInfo()->weapon_type == WEAPONTYPE_KNIFE && ((usercmd->buttons & IN_ATTACK) || (usercmd->buttons & IN_ATTACK2)))
+		if (weapon->GetWeapInfo()->weapon_type() == WEAPONTYPE_KNIFE && ((usercmd->buttons & IN_ATTACK) || (usercmd->buttons & IN_ATTACK2)))
 			return;
 		else if ((usercmd->buttons & IN_ATTACK) && (weapon->m_iItemDefinitionIndex() != WEAPON_C4 || g_Options.hvh_antiaim_x != AA_PITCH_OFF))
 			return;

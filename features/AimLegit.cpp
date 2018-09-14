@@ -197,7 +197,7 @@ void AimLegit::Triggerbot()
 
 	Math::AngleVectors(viewangles, forward);
 
-	forward *= g_LocalPlayer->m_hActiveWeapon().Get()->GetWeapInfo()->m_fRange;
+	forward *= g_LocalPlayer->m_hActiveWeapon().Get()->GetWeapInfo()->m_fRange();
 
 	rem = src + forward;
 

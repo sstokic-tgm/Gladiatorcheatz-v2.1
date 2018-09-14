@@ -100,7 +100,7 @@ void InitializeKits()
 	// call    CEconItemSchema::GetPaintKitDefinition
 
 
-	auto sig_address = Utils::PatternScan(GetModuleHandle("client.dll"), "E8 ?? ?? ?? ?? FF 76 0C 8D 48 04 E8");
+	auto sig_address = Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "E8 ?? ?? ?? ?? FF 76 0C 8D 48 04 E8");
 
 	// Skip the opcode, read rel32 address
 	auto item_system_offset = *reinterpret_cast< int32_t* >(sig_address + 1);

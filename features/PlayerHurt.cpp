@@ -55,6 +55,7 @@ void PlayerHurtEvent::FireGameEvent(IGameEvent *event)
 			case HITGROUP_GEAR:
 				return "gear";
 			}
+			return "generic";
 		};
 
 		EventInfo info;

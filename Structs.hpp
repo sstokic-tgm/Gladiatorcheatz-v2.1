@@ -64,19 +64,40 @@ class CStudioHdr;
 class WeapInfo_t
 {
 public:
+	__int32 weapon_type()
+	{
+		return *reinterpret_cast<__int32*>(reinterpret_cast<uintptr_t>(this) + 0xC8);
+	}
 
-	char pad00[0xC8];
-	__int32 weapon_type;
-	char padCC[0x20];
-	__int32 m_iDamage;
-	float m_fArmorRatio;
-	char padF4[0x4];
-	float m_fPenetration;
-	char padFC[0x8];
-	float m_fRange;
-	float m_fRangeModifier;
-	char pad10C[0x10];
-	bool m_bHasSilencer;
+	__int32 m_iDamage()
+	{
+		return *reinterpret_cast<__int32*>(reinterpret_cast<uintptr_t>(this) + 0xF0);
+	}
+
+	float m_fArmorRatio()
+	{
+		return *reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(this) + 0xF4);
+	}
+
+	float m_fPenetration()
+	{
+		return *reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(this) + 0xFC);
+	}
+
+	float m_fRange()
+	{
+		return *reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(this) + 0x108);
+	}
+
+	float m_fRangeModifier()
+	{
+		return *reinterpret_cast<float*>(reinterpret_cast<uintptr_t>(this) + 0x10C);
+	}
+
+	bool m_bHasSilencer()
+	{
+		return *reinterpret_cast<bool*>(reinterpret_cast<uintptr_t>(this) + 0x120);
+	}
 };
 
 class C_BaseEntity : public IClientEntity
@@ -150,7 +171,7 @@ class C_BaseCombatWeapon : public C_BaseAttributableItem
 public:
 
 	NETVAR(float_t, m_flNextPrimaryAttack, "CBaseCombatWeapon", "m_flNextPrimaryAttack");
-	NETVAR(int32_t, m_iItemDefinitionIndex, "CBaseCombatWeapon", "m_iItemDefinitionIndex");
+	NETVAR(int16_t, m_iItemDefinitionIndex, "CBaseCombatWeapon", "m_iItemDefinitionIndex");
 	NETVAR(int32_t, m_iClip1, "CBaseCombatWeapon", "m_iClip1");
 	NETVAR(int32_t, m_iViewModelIndex, "CBaseCombatWeapon", "m_iViewModelIndex");
 	NETVAR(int32_t, m_iWorldModelIndex, "CBaseCombatWeapon", "m_iWorldModelIndex");
@@ -291,7 +312,7 @@ public:
 
 	bool HandleBoneSetup(int32_t boneMask, matrix3x4_t *boneOut, float_t curtime);
 
-	const Vector &WorldSpaceCenter();
+	const Vector WorldSpaceCenter();
 	Vector GetEyePos();
 	player_info_t GetPlayerInfo();
 	std::string GetName(bool console_safe = false);

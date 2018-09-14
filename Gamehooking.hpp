@@ -104,10 +104,15 @@ extern IsBoxVisible_t o_IsBoxVisible;
 typedef bool(__thiscall *IsHLTV_t)(void*);
 extern IsHLTV_t o_IsHLTV;
 
+typedef void(__thiscall *CusorFunc_t)(void*);
+extern CusorFunc_t o_LockCursor;
+extern CusorFunc_t o_UnlockCursor;
+
 namespace Handlers
 {
 	void __fastcall PaintTraverse_h(void *thisptr, void*, unsigned int vguiPanel, bool forceRepaint, bool allowForce);
 	bool __stdcall CreateMove_h(float smt, CUserCmd *userCMD);
+	void __fastcall LockCursor_h(void* ecx, void*);
 	void __stdcall PlaySound_h(const char *folderIme);
 	HRESULT __stdcall EndScene_h(IDirect3DDevice9 *pDevice);
 	HRESULT __stdcall Reset_h(IDirect3DDevice9 *pDevice, D3DPRESENT_PARAMETERS *pPresentationParameters);

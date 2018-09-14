@@ -159,6 +159,7 @@ public:
     virtual bool                  IsPaused(void) = 0; // 90
     virtual float                 GetTimescale(void) const = 0;
     virtual bool                  IsTakingScreenshot(void) = 0;
+	virtual void				  Unknown_0(void) = 0;
     virtual bool                  IsHLTV(void) = 0;
     virtual bool                  IsLevelMainMenuBackground(void) = 0;
     virtual void                  GetMainMenuBackgroundName(char *dest, int destlen) = 0;

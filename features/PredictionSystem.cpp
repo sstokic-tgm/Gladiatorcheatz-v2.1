@@ -5,7 +5,7 @@
 void PredictionSystem::Start(CUserCmd *userCMD, C_BasePlayer* player)
 {
 	*predictionRandomSeed = MD5_PseudoRandom(userCMD->command_number) & 0x7FFFFFFF;
-	predictionPlayer = player;
+	//predictionPlayer = player;
 
 	m_flOldCurTime = g_GlobalVars->curtime;
 	m_flOldFrametime = g_GlobalVars->frametime;
@@ -36,7 +36,7 @@ void PredictionSystem::End(C_BasePlayer* player)
 	g_MoveHelper->SetHost(nullptr);
 
 	*predictionRandomSeed = -1;
-	predictionPlayer = nullptr;
+	//predictionPlayer = nullptr;
 
 	g_GlobalVars->curtime = m_flOldCurTime;
 	g_GlobalVars->frametime = m_flOldFrametime;

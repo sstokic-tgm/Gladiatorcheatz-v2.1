@@ -8,9 +8,9 @@ class PredictionSystem : public Singleton<PredictionSystem>
 
 public:
 	PredictionSystem() {
-		auto client = GetModuleHandle("client.dll");
+		auto client = GetModuleHandle("client_panorama.dll");
 		predictionRandomSeed = *(int**)(Utils::PatternScan(client, "8B 0D ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 83 C4 04") + 2);
-		predictionPlayer = *reinterpret_cast<C_BasePlayer**>(Utils::PatternScan(client, "89 3D ? ? ? ? F3 0F 10 47") + 2);
+		//predictionPlayer = *reinterpret_cast<C_BasePlayer**>(Utils::PatternScan(client, "89 3D ? ? ? ? F3 0F 10 47") + 2); // TODO
 	}
 
 	void Start(CUserCmd *userCMD, C_BasePlayer* player);

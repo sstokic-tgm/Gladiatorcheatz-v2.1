@@ -374,7 +374,7 @@ bool AimRage::HitChance(QAngle angles, C_BasePlayer *ent, float chance)
 		Math::AngleVectors(viewAnglesSpread, viewForward);
 		viewForward.NormalizeInPlace();
 
-		viewForward = src + (viewForward * weapon->GetWeapInfo()->m_fRange);
+		viewForward = src + (viewForward * weapon->GetWeapInfo()->m_fRange());
 
 		trace_t tr;
 		Ray_t ray;
@@ -558,11 +558,11 @@ bool AimRage::SimulateFireBullet(C_BaseCombatWeapon *weap, FireBulletData &data,
 	if (weaponData == NULL)
 		return false;
 
-	data.current_damage = (float)weaponData->m_iDamage;
+	data.current_damage = (float)weaponData->m_iDamage();
 
 	while ((data.penetrate_count > 0) && (data.current_damage >= 1.0f))
 	{
-		data.trace_length_remaining = weaponData->m_fRange - data.trace_length;
+		data.trace_length_remaining = weaponData->m_fRange() - data.trace_length;
 
 		Vector end = data.src + data.direction * data.trace_length_remaining;
 
@@ -585,9 +585,9 @@ bool AimRage::SimulateFireBullet(C_BaseCombatWeapon *weap, FireBulletData &data,
 		float enter_surf_penetration_mod = enter_surface_data->game.flPenetrationModifier;
 
 		data.trace_length += data.enter_trace.fraction * data.trace_length_remaining;
-		data.current_damage *= pow(weaponData->m_fRangeModifier, data.trace_length * 0.002);
+		data.current_damage *= pow(weaponData->m_fRangeModifier(), data.trace_length * 0.002);
 
-		if (data.trace_length > 3000.f && weaponData->m_fPenetration > 0.f || enter_surf_penetration_mod < 0.1f)
+		if (data.trace_length > 3000.f && weaponData->m_fPenetration() > 0.f || enter_surf_penetration_mod < 0.1f)
 			break;
 
 		if ((data.enter_trace.hitgroup <= 7) && (data.enter_trace.hitgroup > 0))
@@ -596,7 +596,7 @@ bool AimRage::SimulateFireBullet(C_BaseCombatWeapon *weap, FireBulletData &data,
 			if (pPlayer->IsPlayer() && pPlayer->m_iTeamNum() == g_LocalPlayer->m_iTeamNum())
 				return false;
 
-			ScaleDamage(data.enter_trace.hitgroup, pPlayer, weaponData->m_fArmorRatio, data.current_damage);
+			ScaleDamage(data.enter_trace.hitgroup, pPlayer, weaponData->m_fArmorRatio(), data.current_damage);
 
 			return true;
 		}
@@ -623,7 +623,7 @@ bool AimRage::HandleBulletPenetration(WeapInfo_t *wpn_data, FireBulletData &data
 			return false;
 	}
 
-	if (data.penetrate_count <= 0 || wpn_data->m_fPenetration <= 0.f)
+	if (data.penetrate_count <= 0 || wpn_data->m_fPenetration() <= 0.f)
 		return false;
 
 	Vector dummy;
@@ -669,7 +669,7 @@ bool AimRage::HandleBulletPenetration(WeapInfo_t *wpn_data, FireBulletData &data
 
 	float modifier = fmaxf(0.0f, 1.0f / combined_penetration_modifier);
 	float thickness = (trace_exit.endpos - data.enter_trace.endpos).LengthSqr();
-	float taken_damage = ((modifier * 3.0f) * fmaxf(0.0f, (3.0f / wpn_data->m_fPenetration) * 1.25f) + (data.current_damage * final_damage_modifier)) + ((thickness * modifier) / 24.0f);
+	float taken_damage = ((modifier * 3.0f) * fmaxf(0.0f, (3.0f / wpn_data->m_fPenetration()) * 1.25f) + (data.current_damage * final_damage_modifier)) + ((thickness * modifier) / 24.0f);
 
 	float lost_damage = fmaxf(0.0f, taken_damage);
 
@@ -762,7 +762,7 @@ bool AimRage::TraceToExit(Vector &end, CGameTrace *enter_trace, Vector start, Ve
 bool AimRage::IsBreakableEntity(C_BasePlayer *ent)
 {
 	typedef bool(__thiscall *isBreakbaleEntityFn)(C_BasePlayer*);
-	static isBreakbaleEntityFn IsBreakableEntityFn = (isBreakbaleEntityFn)Utils::PatternScan(GetModuleHandle("client.dll"), "55 8B EC 51 56 8B F1 85 F6 74 68");
+	static isBreakbaleEntityFn IsBreakableEntityFn = (isBreakbaleEntityFn)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 51 56 8B F1 85 F6 74 68");
 
 	if (IsBreakableEntityFn)
 	{
@@ -940,4 +940,5 @@ int AimRage::GetTickbase(CUserCmd* ucmd) {
 	}
 
 	g_pLastCmd = ucmd;
+	return g_tick;
 }

@@ -42,7 +42,7 @@ WeapInfo_t *C_BaseCombatWeapon::GetWeapInfo()
 		return NULL;
 
 	typedef WeapInfo_t *(__thiscall *o_getWeapInfo)(void*);
-	return VT::vfunc<o_getWeapInfo>(this, 447)(this);
+	return VT::vfunc<o_getWeapInfo>(this, 444)(this);
 }
 
 bool C_BaseCombatWeapon::HasBullets()
@@ -65,13 +65,13 @@ bool C_BaseCombatWeapon::CanFire()
 
 bool C_BaseCombatWeapon::IsReloading()
 {
-	static auto inReload = *(uint32_t*)(Utils::PatternScan(GetModuleHandle("client.dll"), "C6 87 ? ? ? ? ? 8B 06 8B CE FF 90") + 2);
+	static auto inReload = *(uint32_t*)(Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "C6 87 ? ? ? ? ? 8B 06 8B CE FF 90") + 2);
 	return *(bool*)((uintptr_t)this + inReload);
 }
 
 bool C_BaseCombatWeapon::IsRifle()
 {
-	switch (GetWeapInfo()->weapon_type)
+	switch (GetWeapInfo()->weapon_type())
 	{
 	case WEAPONTYPE_RIFLE:
 		return true;
@@ -88,7 +88,7 @@ bool C_BaseCombatWeapon::IsRifle()
 
 bool C_BaseCombatWeapon::IsPistol()
 {
-	switch (GetWeapInfo()->weapon_type)
+	switch (GetWeapInfo()->weapon_type())
 	{
 	case WEAPONTYPE_PISTOL:
 		return true;
@@ -99,7 +99,7 @@ bool C_BaseCombatWeapon::IsPistol()
 
 bool C_BaseCombatWeapon::IsSniper()
 {
-	switch (GetWeapInfo()->weapon_type)
+	switch (GetWeapInfo()->weapon_type())
 	{
 	case WEAPONTYPE_SNIPER_RIFLE:
 		return true;
@@ -110,7 +110,7 @@ bool C_BaseCombatWeapon::IsSniper()
 
 bool C_BaseCombatWeapon::IsGrenade()
 {
-	switch (GetWeapInfo()->weapon_type)
+	switch (GetWeapInfo()->weapon_type())
 	{
 	case WEAPONTYPE_GRENADE:
 		return true;
@@ -121,17 +121,17 @@ bool C_BaseCombatWeapon::IsGrenade()
 
 float C_BaseCombatWeapon::GetInaccuracy()
 {
-	return VT::vfunc<float(__thiscall*)(void*)>(this, 470)(this);
+	return VT::vfunc<float(__thiscall*)(void*)>(this, 467)(this);
 }
 
 float C_BaseCombatWeapon::GetSpread()
 {
-	return VT::vfunc<float(__thiscall*)(void*)>(this, 439)(this);
+	return VT::vfunc<float(__thiscall*)(void*)>(this, 437)(this);
 }
 
 void C_BaseCombatWeapon::UpdateAccuracyPenalty()
 {
-	VT::vfunc<void(__thiscall*)(void*)>(this, 471)(this);
+	VT::vfunc<void(__thiscall*)(void*)>(this, 469)(this);
 }
 
 bool C_BaseCombatWeapon::IsWeaponNonAim()
@@ -314,6 +314,7 @@ AnimationLayer *C_BasePlayer::GetAnimOverlay(int i)
 {
 	if (i < 15)
 		return &GetAnimOverlays()[i];
+	return nullptr;
 }
 
 int C_BasePlayer::GetSequenceActivity(int sequence)
@@ -334,7 +335,7 @@ int C_BasePlayer::GetSequenceActivity(int sequence)
 
 C_CSGOPlayerAnimState *C_BasePlayer::GetPlayerAnimState()
 {
-	return (C_CSGOPlayerAnimState*)((uintptr_t)this + 0x3870);
+	return (C_CSGOPlayerAnimState*)((uintptr_t)this + 0x3884);
 }
 
 void C_BasePlayer::UpdateAnimationState(C_CSGOPlayerAnimState *state, QAngle angle)
@@ -342,7 +343,7 @@ void C_BasePlayer::UpdateAnimationState(C_CSGOPlayerAnimState *state, QAngle ang
 	if (!state)
 		return;
 
-	static auto UpdateAnimState = Utils::PatternScan(GetModuleHandle("client.dll"), "55 8B EC 83 E4 F8 83 EC 18 56 57 8B F9 F3 0F 11 54 24");
+	static auto UpdateAnimState = Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 83 E4 F8 83 EC 18 56 57 8B F9 F3 0F 11 54 24");
 	if (!UpdateAnimState)
 		return;
 
@@ -363,7 +364,7 @@ void C_BasePlayer::ResetAnimationState(C_CSGOPlayerAnimState *state)
 		return;
 
 	using ResetAnimState_t = void(__thiscall*)(C_CSGOPlayerAnimState*);
-	static auto ResetAnimState = (ResetAnimState_t)Utils::PatternScan(GetModuleHandle("client.dll"), "56 6A 01 68 ? ? ? ? 8B F1");
+	static auto ResetAnimState = (ResetAnimState_t)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "56 6A 01 68 ? ? ? ? 8B F1");
 	if (!ResetAnimState)
 		return;
 
@@ -373,7 +374,7 @@ void C_BasePlayer::ResetAnimationState(C_CSGOPlayerAnimState *state)
 void C_BasePlayer::CreateAnimationState(C_CSGOPlayerAnimState *state)
 {
 	using CreateAnimState_t = void(__thiscall*)(C_CSGOPlayerAnimState*, C_BasePlayer*);
-	static auto CreateAnimState = (CreateAnimState_t)Utils::PatternScan(GetModuleHandle("client.dll"), "55 8B EC 56 8B F1 B9 ? ? ? ? C7 46");
+	static auto CreateAnimState = (CreateAnimState_t)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 56 8B F1 B9 ? ? ? ? C7 46");
 	if (!CreateAnimState)
 		return;
 
@@ -462,7 +463,7 @@ bool C_BasePlayer::HandleBoneSetup(int32_t boneMask, matrix3x4_t *boneOut, float
 	return true;
 }
 
-const Vector &C_BasePlayer::WorldSpaceCenter()
+const Vector C_BasePlayer::WorldSpaceCenter()
 {
 	Vector vecOrigin = m_vecOrigin();
 
@@ -549,7 +550,7 @@ bool C_BasePlayer::HasC4()
 {
 	static auto fnHasC4
 		= reinterpret_cast<bool(__thiscall*)(void*)>(
-			Utils::PatternScan(GetModuleHandle("client.dll"), "56 8B F1 85 F6 74 31")
+			Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "56 8B F1 85 F6 74 31")
 			);
 
 	return fnHasC4(this);
@@ -650,7 +651,7 @@ VarMapping_t *C_BasePlayer::VarMapping()
 void C_BasePlayer::SetAbsOrigin(const Vector &origin)
 {
 	using SetAbsOriginFn = void(__thiscall*)(void*, const Vector &origin);
-	static SetAbsOriginFn SetAbsOrigin = (SetAbsOriginFn)Utils::PatternScan(GetModuleHandle("client.dll"), "55 8B EC 83 E4 F8 51 53 56 57 8B F1 E8");
+	static SetAbsOriginFn SetAbsOrigin = (SetAbsOriginFn)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 83 E4 F8 51 53 56 57 8B F1 E8");
 	
 	SetAbsOrigin(this, origin);
 }
@@ -658,7 +659,7 @@ void C_BasePlayer::SetAbsOrigin(const Vector &origin)
 void C_BasePlayer::SetAbsAngles(const QAngle &angles)
 {
 	using SetAbsAnglesFn = void(__thiscall*)(void*, const QAngle &angles);
-	static SetAbsAnglesFn SetAbsAngles = (SetAbsAnglesFn)Utils::PatternScan(GetModuleHandle("client.dll"), "55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1 E8");
+	static SetAbsAnglesFn SetAbsAngles = (SetAbsAnglesFn)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1 E8");
 	
 	SetAbsAngles(this, angles);
 }

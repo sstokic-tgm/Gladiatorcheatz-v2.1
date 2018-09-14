@@ -321,6 +321,14 @@ bool __stdcall Handlers::CreateMove_h(float smt, CUserCmd *userCMD)
 	return false;
 }
 
+void __fastcall Handlers::LockCursor_h(void* ecx, void*)
+{
+	if (menuOpen)
+		o_UnlockCursor(ecx);
+	else
+		o_LockCursor(ecx);
+}
+
 void __stdcall Handlers::PlaySound_h(const char *folderIme)
 {
 	o_PlaySound(g_VGuiSurface, folderIme);
@@ -672,7 +680,7 @@ bool __stdcall Handlers::InPrediction_h()
 	{
 		// Breaks more than it fixes.
 		//// xref : "%8.4f : %30s : %5.3f : %4.2f  +\n" https://github.com/ValveSoftware/source-sdk-2013/blob/master/mp/src/game/client/c_baseanimating.cpp#L1808
-		//static DWORD inprediction_check = (DWORD)Utils::PatternScan(GetModuleHandle("client.dll"), "84 C0 74 17 8B 87");
+		//static DWORD inprediction_check = (DWORD)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "84 C0 74 17 8B 87");
 		//if (inprediction_check == (DWORD)_ReturnAddress()) {
 		//	return true; // no sequence transition / decay
 		//}
@@ -1024,7 +1032,7 @@ float __fastcall Handlers::GetViewModelFov_h(void* ECX, void* EDX)
 bool __fastcall Handlers::GetBool_SVCheats_h(PVOID pConVar, int edx)
 {
 	// xref : "Pitch: %6.1f   Yaw: %6.1f   Dist: %6.1f %16s"
-	static DWORD CAM_THINK = (DWORD)Utils::PatternScan(GetModuleHandle("client.dll"), "85 C0 75 30 38 86");
+	static DWORD CAM_THINK = (DWORD)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), "85 C0 75 30 38 86");
 	if (!pConVar)
 		return false;
 
@@ -1083,7 +1091,7 @@ bool __fastcall Handlers::WriteUsercmdDeltaToBuffer_h(IBaseClientDLL *ECX, void 
 	auto WriteUsercmd = [](bf_write *buf, CUserCmd *in, CUserCmd *out)
 	{
 		//using WriteUsercmd_t = void(__fastcall*)(bf_write*, CUserCmd*, CUserCmd*);
-		static DWORD WriteUsercmdF = (DWORD)Utils::PatternScan(GetModuleHandle("client.dll"), ("55 8B EC 83 E4 F8 51 53 56 8B D9 8B 0D"));
+		static DWORD WriteUsercmdF = (DWORD)Utils::PatternScan(GetModuleHandle("client_panorama.dll"), ("55 8B EC 83 E4 F8 51 53 56 8B D9 8B 0D"));
 
 		__asm
 		{
