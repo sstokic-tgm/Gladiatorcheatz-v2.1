@@ -264,7 +264,7 @@ bool Visuals::IsVisibleScan(C_BasePlayer *player)
 bool Visuals::ValidPlayer(C_BasePlayer *player, bool count_step)
 {
 	int idx = player->EntIndex();
-	constexpr float frequency = 0.35f / 0.5f;
+	constexpr float frequency = 0.7f / 0.5f;
 	float step = frequency * g_GlobalVars->frametime;
 	if (!player->IsAlive())
 		return false;
