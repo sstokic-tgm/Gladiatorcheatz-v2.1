@@ -243,7 +243,7 @@ public:
 	NETVAR(CHandle<C_BaseViewModel>, m_hViewModel, "CBasePlayer", "m_hViewModel[0]");
 	NETVAR(Vector, m_vecVelocity, "CBasePlayer", "m_vecVelocity[0]");
 	NETVAR(float_t, m_flSimulationTime, "CBaseEntity", "m_flSimulationTime");
-	NETVAR(int32_t, m_nSurvivalTeam, "CBaseEntity", "m_nSurvivalTeam");
+	NETVAR(int32_t, m_nSurvivalTeam, "CCSPlayer", "m_nSurvivalTeam");
 	NETVARADDOFFS(float_t, m_flOldSimulationTime, "CBaseEntity", "m_flSimulationTime", 0x4);
 	NETVAR(float_t, m_flDuckSpeed, "CCSPlayer", "m_flDuckSpeed");
 	NETVAR(float_t, m_flDuckAmount, "CCSPlayer", "m_flDuckAmount");

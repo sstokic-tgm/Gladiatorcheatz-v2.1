@@ -66,7 +66,6 @@ enum Hitboxes
 {
     HITBOX_HEAD,
     HITBOX_NECK,
-    HITBOX_LOWER_NECK,
     HITBOX_PELVIS,
     HITBOX_STOMACH,
     HITBOX_LOWER_CHEST,
@@ -153,7 +152,8 @@ struct mstudiohitboxset_t
 
 	inline mstudiobbox_t *pHitbox(int i) const
 	{
-		return (mstudiobbox_t*)(((byte*)this) + hitboxindex) + i;
+		if (i > numhitboxes) return nullptr;
+		return (mstudiobbox_t*)((uint8_t*)this + hitboxindex) + i;
 	}
 };
 
