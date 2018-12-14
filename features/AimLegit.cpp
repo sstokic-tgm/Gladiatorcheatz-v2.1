@@ -96,7 +96,7 @@ bool AimLegit::CheckTarget(C_BasePlayer *player)
 	if (player == g_LocalPlayer)
 		return false;
 
-	if (player->m_iTeamNum() == g_LocalPlayer->m_iTeamNum())
+	if (player->IsTeamMate())
 		return false;
 
 	if (player->IsDormant())

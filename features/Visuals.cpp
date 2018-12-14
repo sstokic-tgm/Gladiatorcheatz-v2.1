@@ -216,7 +216,7 @@ bool Visuals::IsVisibleScan(C_BasePlayer *player)
 	CTraceFilter filter;
 	filter.pSkip = g_LocalPlayer;
 
-	if (!player->SetupBones(boneMatrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, 0.0f))
+	if (!player->SetupBones2(boneMatrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, 0.0f))
 	{
 		return false;
 	}
@@ -229,8 +229,6 @@ bool Visuals::IsVisibleScan(C_BasePlayer *player)
 
 	int scan_hitboxes[] = {
 		HITBOX_HEAD,
-		HITBOX_LEFT_FOREARM,
-		HITBOX_LEFT_UPPER_ARM,
 		HITBOX_LEFT_FOOT,
 		HITBOX_RIGHT_FOOT,
 		HITBOX_LEFT_CALF,
@@ -301,7 +299,7 @@ bool Visuals::ValidPlayer(C_BasePlayer *player, bool count_step)
 bool Visuals::Begin(C_BasePlayer *player)
 {
 	ESP_ctx.player = player;
-	ESP_ctx.bEnemy = g_LocalPlayer->m_iTeamNum() != player->m_iTeamNum();
+	ESP_ctx.bEnemy = !player->IsTeamMate(); // not sure hmmmmm, still tired // g_LocalPlayer->m_iTeamNum() != player->m_iTeamNum();
 	ESP_ctx.isVisible = Visuals::IsVisibleScan(player);
 	local_observed = (C_BasePlayer*)g_EntityList->GetClientEntityFromHandle(g_LocalPlayer->m_hObserverTarget());
 
@@ -484,7 +482,7 @@ void Visuals::DrawAngleLines()
 
 void Visuals::DrawWatermark()
 {
-	DrawString(watermark_font, 10, 10, Color(0, 153, 204, 255), FONT_LEFT, "Gladiatorcheatz v2.0: Counter-Strike: Global Offensive");
+	DrawString(watermark_font, 10, 10, Color(0, 153, 204, 255), FONT_LEFT, "Gladiatorcheatz v2.1: Counter-Strike: Global Offensive");
 }
 
 void Visuals::DrawResolverModes()
@@ -506,7 +504,7 @@ void Visuals::DrawCapsuleOverlay(int idx, float duration)
 		return;
 
 	matrix3x4_t boneMatrix_actual[MAXSTUDIOBONES];
-	if (!player->SetupBones(boneMatrix_actual, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, g_EngineClient->GetLastTimeStamp()))
+	if (!player->SetupBones2(boneMatrix_actual, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, player->m_flSimulationTime()))
 		return;
 
 	studiohdr_t *studioHdr = g_MdlInfo->GetStudiomodel(player->GetModel());
@@ -655,7 +653,7 @@ void Visuals::RenderSkelet()
 	if (studioHdr)
 	{
 		static matrix3x4_t boneToWorldOut[128];
-		if (ESP_ctx.player->SetupBones(boneToWorldOut, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, g_GlobalVars->curtime))
+		if (ESP_ctx.player->SetupBones2(boneToWorldOut, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, ESP_ctx.player->m_flSimulationTime()))
 		//if(ESP_ctx.player->HandleBoneSetup(BONE_USED_BY_HITBOX, boneToWorldOut))
 		{
 			for (int i = 0; i < studioHdr->numbones; i++)

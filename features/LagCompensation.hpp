@@ -103,7 +103,7 @@ public:
 
 	int GetPriorityLevel(C_BasePlayer *player, LagRecord* lag_record);
 	void SimulateMovement(Vector &velocity, Vector &origin, C_BasePlayer *player, int &flags, bool was_in_air);
-	void AnimationFix(C_BasePlayer *player);
+	void FakelagFix(C_BasePlayer *player);
 
 	void SetOverwriteTick(C_BasePlayer *player, QAngle angles, float_t correct_time, uint32_t priority);
 

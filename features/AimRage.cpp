@@ -66,7 +66,7 @@ bool AimRage::TargetSpecificEnt(C_BasePlayer* pEnt)
 	else
 	{
 		matrix3x4_t matrix[128];
-		if (!pEnt->SetupBones(matrix, 128, 256, g_EngineClient->GetLastTimeStamp()))
+		if (!pEnt->SetupBones2(matrix, 128, 256, pEnt->m_flSimulationTime()))
 			return false;
 
 		if (g_Options.rage_autobaim && firedShots > g_Options.rage_baim_after_x_shots)
@@ -310,7 +310,7 @@ bool AimRage::CheckTarget(int i)
 	if (player == g_LocalPlayer)
 		return false;
 
-	if (player->m_iTeamNum() == g_LocalPlayer->m_iTeamNum())
+	if (player->IsTeamMate())
 		return false;
 
 	if (player->IsDormant())
@@ -693,7 +693,7 @@ bool AimRage::TraceToExit(Vector &end, CGameTrace *enter_trace, Vector start, Ve
 	auto distance = 0.0f;
 	int first_contents = 0;
 
-	while (distance <= 90.0f)
+	while (distance < 90.0f)
 	{
 		distance += 4.0f;
 		end = start + (dir * distance);
@@ -766,9 +766,9 @@ bool AimRage::IsBreakableEntity(C_BasePlayer *ent)
 
 	if (IsBreakableEntityFn)
 	{
-		// 0x27C = m_takedamage
+		// 0x280 = m_takedamage
 
-		auto backupval = *reinterpret_cast<int*>((uint32_t)ent + 0x27C);
+		auto backupval = *reinterpret_cast<int*>((uint32_t)ent + 0x280);
 		auto className = ent->GetClientClass()->m_pNetworkName;
 
 		if (ent != g_EntityList->GetClientEntity(0))
@@ -778,13 +778,13 @@ bool AimRage::IsBreakableEntity(C_BasePlayer *ent)
 			if ((className[1] == 'B' && className[9] == 'e' && className[10] == 'S' && className[16] == 'e') // CBreakableSurface
 				|| (className[1] != 'B' || className[5] != 'D')) // CBaseDoor because fuck doors
 			{
-				*reinterpret_cast<int*>((uint32_t)ent + 0x27C) = 2;
+				*reinterpret_cast<int*>((uint32_t)ent + 0x280) = 2;
 			}
 		}
 
 		bool retn = IsBreakableEntityFn(ent);
 
-		*reinterpret_cast<int*>((uint32_t)ent + 0x27C) = backupval;
+		*reinterpret_cast<int*>((uint32_t)ent + 0x280) = backupval;
 
 		return retn;
 	}

@@ -28,6 +28,7 @@ public:
     inline CUserCmd* GetUserCmd(int sequence_number);
     inline CVerifiedUserCmd* GetVerifiedCmd(int sequence_number);
 
+	char				pad_0x00[0x8];
 	bool                m_fTrackIRAvailable;
 	bool                m_fMouseInitialized;
 	bool                m_fMouseActive;

@@ -248,7 +248,7 @@ namespace Utils
 
 		using ServerRankRevealAll = char(__cdecl*)(int*);
 
-		static auto fnServerRankRevealAll = PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 8B 0D ? ? ? ? 68");
+		static auto fnServerRankRevealAll = PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 8B 0D ? ? ? ? 85 C9 75 28 A1");
 
 		int v[3] = { 0,0,0 };
 
@@ -260,9 +260,17 @@ namespace Utils
 		FUNCTION_GUARD;
 
 		using IsReadyFn = void(__cdecl*)();
-		static auto fnIsReady = PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 83 E4 F8 83 EC 08 56 8B 35 ? ? ? ? 57 83 BE");
+		static auto fnIsReady = PatternScan(GetModuleHandle("client_panorama.dll"), "55 8B EC 51 56 8B 35 ? ? ? ? 57 83 BE");
 
 		reinterpret_cast<IsReadyFn>(fnIsReady)();
+	}
+
+	bool IsDangerZone()
+	{
+		static auto game_mode = g_CVar->FindVar("game_mode");
+		static auto game_type = g_CVar->FindVar("game_type");
+
+		return game_mode->GetInt() == 0 && game_type->GetInt() == 6;
 	}
 
 	void SetClantag(const char *tag)

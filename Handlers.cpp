@@ -139,7 +139,7 @@ void __fastcall Handlers::PaintTraverse_h(void *thisptr, void*, unsigned int vgu
 			Visuals::InitFont();
 
 			g_EngineClient->ExecuteClientCmd("clear");
-			g_CVar->ConsoleColorPrintf(Color(0, 153, 204, 255), "Gladiatorcheatz v2 - rev.20171228\n");
+			g_CVar->ConsoleColorPrintf(Color(0, 153, 204, 255), "Gladiatorcheatz v2.1 - rev.20181214\n");
 
 			long res = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, Global::my_documents_folder);
 			if (res == S_OK)
@@ -503,7 +503,7 @@ void __stdcall Handlers::FrameStageNotify_h(ClientFrameStage_t stage)
 			if (!player->IsAlive())
 				continue;
 
-			if (player->m_iTeamNum() == g_LocalPlayer->m_iTeamNum())
+			if (player->IsTeamMate())
 				continue;
 
 			VarMapping_t *map = player->VarMapping();
@@ -547,7 +547,7 @@ void __stdcall Handlers::FrameStageNotify_h(ClientFrameStage_t stage)
 				*view_punch = QAngle(0.f, 0.f, 0.f);
 			}
 
-			if (*(bool*)((uintptr_t)g_Input + 0xA5))
+			if (g_Input->m_fCameraInThirdPerson)
 				g_LocalPlayer->visuals_Angles() = Global::visualAngles;
 
 			if (g_Options.removals_smoke)
@@ -1015,7 +1015,7 @@ bool __fastcall Handlers::TempEntities_h(void* ECX, void* EDX, void* msg)
 					pEntity->m_vecOrigin() = (lag_records.begin()->m_vecOrigin + (g_GlobalVars->interval_per_tick * lag_records.begin()->m_vecVelocity * choked));
 				}
 
-				//CMBacktracking::Get().SetOverwriteTick(pEntity, CalcedAngle, shot_time, 1);
+				CMBacktracking::Get().SetOverwriteTick(pEntity, CalcedAngle, shot_time, 1);
 			}
 		}
 		ei = next;

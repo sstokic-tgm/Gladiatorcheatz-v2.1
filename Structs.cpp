@@ -10,7 +10,7 @@ bool C_BaseEntity::IsPlayer()
 	//index: 152
 	//ref: "effects/nightvision"
 	//sig: 8B 92 ? ? ? ? FF D2 84 C0 0F 45 F7 85 F6
-	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 152)(this);
+	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 153)(this);
 }
 
 bool C_BaseEntity::IsWeapon()
@@ -18,7 +18,7 @@ bool C_BaseEntity::IsWeapon()
 	//index: 160
 	//ref: "CNewParticleEffect::DrawModel"
 	//sig: 8B 80 ? ? ? ? FF D0 84 C0 74 6F 8B 4D A4
-	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 160)(this);
+	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 161)(this);
 }
 
 bool C_BaseEntity::IsPlantedC4()
@@ -33,7 +33,7 @@ bool C_BaseEntity::IsDefuseKit()
 
 unsigned int C_BaseEntity::PhysicsSolidMaskForEntity()
 {
-	return VT::vfunc<unsigned int(__thiscall*)(C_BaseEntity*)>(this, 148)(this);
+	return VT::vfunc<unsigned int(__thiscall*)(C_BaseEntity*)>(this, 149)(this);
 }
 
 WeapInfo_t *C_BaseCombatWeapon::GetWeapInfo()
@@ -42,7 +42,7 @@ WeapInfo_t *C_BaseCombatWeapon::GetWeapInfo()
 		return NULL;
 
 	typedef WeapInfo_t *(__thiscall *o_getWeapInfo)(void*);
-	return VT::vfunc<o_getWeapInfo>(this, 444)(this);
+	return VT::vfunc<o_getWeapInfo>(this, 448)(this);
 }
 
 bool C_BaseCombatWeapon::HasBullets()
@@ -121,17 +121,17 @@ bool C_BaseCombatWeapon::IsGrenade()
 
 float C_BaseCombatWeapon::GetInaccuracy()
 {
-	return VT::vfunc<float(__thiscall*)(void*)>(this, 467)(this);
+	return VT::vfunc<float(__thiscall*)(void*)>(this, 471)(this);
 }
 
 float C_BaseCombatWeapon::GetSpread()
 {
-	return VT::vfunc<float(__thiscall*)(void*)>(this, 437)(this);
+	return VT::vfunc<float(__thiscall*)(void*)>(this, 440)(this);
 }
 
 void C_BaseCombatWeapon::UpdateAccuracyPenalty()
 {
-	VT::vfunc<void(__thiscall*)(void*)>(this, 469)(this);
+	VT::vfunc<void(__thiscall*)(void*)>(this, 472)(this);
 }
 
 bool C_BaseCombatWeapon::IsWeaponNonAim()
@@ -265,7 +265,7 @@ bool C_BaseCombatWeapon::IsInThrow()
 
 float_t C_BasePlayer::m_flSpawnTime()
 {
-	return *(float_t*)((uintptr_t)this + 0xA290);
+	return *(float_t*)((uintptr_t)this + 0xA350);
 }
 
 std::array<float, 24> &C_BasePlayer::m_flPoseParameter()
@@ -281,7 +281,8 @@ QAngle &C_BasePlayer::visuals_Angles()
 
 int32_t C_BasePlayer::GetMoveType()
 {
-	return *(int32_t*)((uintptr_t)this + 0x258);
+	static unsigned int _m_MoveType = Utils::FindInDataMap(GetPredDescMap(), "m_MoveType");
+	return *(int32_t*)((uintptr_t)this + _m_MoveType);
 }
 
 void C_BasePlayer::SetPoseAngles(float_t yaw, float_t pitch)
@@ -294,20 +295,20 @@ void C_BasePlayer::SetPoseAngles(float_t yaw, float_t pitch)
 void C_BasePlayer::InvalidateBoneCache()
 {
 	unsigned long g_iModelBoneCounter = **(unsigned long**)(Offsets::invalidateBoneCache + 10);
-	*(unsigned int*)((DWORD)this + 0x2914) = 0xFF7FFFFF; // m_flLastBoneSetupTime = -FLT_MAX;
-	*(unsigned int*)((DWORD)this + 0x2680) = (g_iModelBoneCounter - 1); // m_iMostRecentModelBoneCounter = g_iModelBoneCounter - 1;
+	*(unsigned int*)((DWORD)this + 0x2924) = 0xFF7FFFFF; // m_flLastBoneSetupTime = -FLT_MAX;
+	*(unsigned int*)((DWORD)this + 0x2690) = (g_iModelBoneCounter - 1); // m_iMostRecentModelBoneCounter = g_iModelBoneCounter - 1;
 }
 
 int C_BasePlayer::GetNumAnimOverlays()
 {
-	return *(int*)((DWORD)this + 0x297C);
+	return *(int*)((DWORD)this + 0x298C);
 }
 
 AnimationLayer *C_BasePlayer::GetAnimOverlays()
 {
 	// to find offset: use 9/12/17 dll
 	// sig: 55 8B EC 51 53 8B 5D 08 33 C0
-	return *(AnimationLayer**)((DWORD)this + 0x2970);
+	return *(AnimationLayer**)((DWORD)this + 0x2980);
 }
 
 AnimationLayer *C_BasePlayer::GetAnimOverlay(int i)
@@ -335,7 +336,7 @@ int C_BasePlayer::GetSequenceActivity(int sequence)
 
 C_CSGOPlayerAnimState *C_BasePlayer::GetPlayerAnimState()
 {
-	return (C_CSGOPlayerAnimState*)((uintptr_t)this + 0x3884);
+	return (C_CSGOPlayerAnimState*)((uintptr_t)this + 0x3900);
 }
 
 void C_BasePlayer::UpdateAnimationState(C_CSGOPlayerAnimState *state, QAngle angle)
@@ -383,24 +384,24 @@ void C_BasePlayer::CreateAnimationState(C_CSGOPlayerAnimState *state)
 
 CBoneAccessor *C_BasePlayer::GetBoneAccessor()
 {
-	return (CBoneAccessor*)((uintptr_t)this + 0x2698);
+	return (CBoneAccessor*)((uintptr_t)this + 0x26A8);
 }
 
 CStudioHdr *C_BasePlayer::GetModelPtr()
 {
-	return *(CStudioHdr**)((uintptr_t)this + 0x293C);
+	return *(CStudioHdr**)((uintptr_t)this + 0x294C);
 }
 
 void C_BasePlayer::StandardBlendingRules(CStudioHdr *hdr, Vector *pos, Quaternion *q, float_t curtime, int32_t boneMask)
 {
 	typedef void(__thiscall *o_StandardBlendingRules)(void*, CStudioHdr*, Vector*, Quaternion*, float_t, int32_t);
-	VT::vfunc<o_StandardBlendingRules>(this, 200)(this, hdr, pos, q, curtime, boneMask);
+	VT::vfunc<o_StandardBlendingRules>(this, 201)(this, hdr, pos, q, curtime, boneMask);
 }
 
 void C_BasePlayer::BuildTransformations(CStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int32_t boneMask, byte *computed)
 {
 	typedef void(__thiscall *o_BuildTransformations)(void*, CStudioHdr*, Vector*, Quaternion*, const matrix3x4_t&, int32_t, byte*);
-	VT::vfunc<o_BuildTransformations>(this, 184)(this, hdr, pos, q, cameraTransform, boneMask, computed);
+	VT::vfunc<o_BuildTransformations>(this, 185)(this, hdr, pos, q, cameraTransform, boneMask, computed);
 }
 
 bool C_BasePlayer::HandleBoneSetup(int32_t boneMask, matrix3x4_t *boneOut, float_t curtime)
@@ -461,6 +462,17 @@ bool C_BasePlayer::HandleBoneSetup(int32_t boneMask, matrix3x4_t *boneOut, float
 	std::memcpy(this->GetAnimOverlays(), backup_layers, (sizeof(AnimationLayer) * this->GetNumAnimOverlays()));
 
 	return true;
+}
+
+bool C_BasePlayer::SetupBones2(matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime)
+{
+	auto backupval = *reinterpret_cast<uint8_t*>((uintptr_t)this + 0x274);
+
+	*reinterpret_cast<uint8_t*>((uintptr_t)this + 0x274) = 0;
+	bool setuped_bones = this->SetupBones(pBoneToWorldOut, nMaxBones, boneMask, currentTime);
+	*reinterpret_cast<uint8_t*>((uintptr_t)this + 0x274) = backupval;
+
+	return setuped_bones;
 }
 
 const Vector C_BasePlayer::WorldSpaceCenter()
@@ -560,7 +572,7 @@ Vector C_BasePlayer::GetBonePos(int bone)
 {
 	matrix3x4_t boneMatrix[MAXSTUDIOBONES];
 
-	if (SetupBones(boneMatrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, g_EngineClient->GetLastTimeStamp())) {
+	if (SetupBones2(boneMatrix, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, this->m_flSimulationTime())) {
 		return Vector(boneMatrix[bone][0][3], boneMatrix[bone][1][3], boneMatrix[bone][2][3]);
 	}
 	return Vector(0, 0, 0);
@@ -573,7 +585,7 @@ int C_BasePlayer::GetBoneByName(const char *boneName)
 		return -1;
 
 	matrix3x4_t boneToWorldOut[MAXSTUDIOBONES];
-	if (!this->SetupBones(boneToWorldOut, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, g_EngineClient->GetLastTimeStamp()))
+	if (!this->SetupBones2(boneToWorldOut, MAXSTUDIOBONES, BONE_USED_BY_HITBOX, this->m_flSimulationTime()))
 		return -1;
 
 	for (int i = 0; i < studioHdr->numbones; i++)
@@ -594,7 +606,7 @@ Vector C_BasePlayer::GetHitboxPos(int hitbox)
 {
 	matrix3x4_t boneMatrix[MAXSTUDIOBONES];
 
-	if (this->SetupBones(boneMatrix, 128, BONE_USED_BY_HITBOX, g_EngineClient->GetLastTimeStamp()))
+	if (this->SetupBones2(boneMatrix, 128, BONE_USED_BY_HITBOX, this->m_flSimulationTime()))
 	{
 		studiohdr_t *studioHdr = g_MdlInfo->GetStudiomodel(this->GetModel());
 		if (studioHdr)
@@ -667,7 +679,7 @@ void C_BasePlayer::SetAbsAngles(const QAngle &angles)
 void C_BasePlayer::UpdateClientSideAnimation()
 {
 	typedef void(__thiscall *o_updateClientSideAnimation)(void*);
-	VT::vfunc<o_updateClientSideAnimation>(this, 218)(this);
+	VT::vfunc<o_updateClientSideAnimation>(this, 219)(this);
 }
 
 int C_BasePlayer::GetPing()

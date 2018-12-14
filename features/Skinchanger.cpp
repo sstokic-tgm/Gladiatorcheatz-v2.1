@@ -21,6 +21,10 @@ const std::map<size_t, Item_t> k_weapon_info =
 	{ WEAPON_KNIFE_SURVIVAL_BOWIE,{ "models/weapons/v_knife_survival_bowie.mdl", "knife_survival_bowie" } },
 	{ WEAPON_KNIFE_BUTTERFLY,{ "models/weapons/v_knife_butterfly.mdl", "knife_butterfly" } },
 	{ WEAPON_KNIFE_PUSH,{ "models/weapons/v_knife_push.mdl", "knife_push" } },
+	{ WEAPON_KNIFE_URSUS,{ "models/weapons/v_knife_ursus.mdl", "knife_ursus" } },
+	{ WEAPON_KNIFE_GYPSY_JACKKNIFE,{ "models/weapons/v_knife_gypsy_jackknife.mdl", "knife_gypsy_jackknife" } },
+	{ WEAPON_KNIFE_STILETTO,{ "models/weapons/v_knife_stiletto.mdl", "knife_stiletto" } },
+	{ WEAPON_KNIFE_WIDOWMAKER,{ "models/weapons/v_knife_widowmaker.mdl", "knife_widowmaker" } },
 	{ GLOVE_STUDDED_BLOODHOUND,{ "models/weapons/v_models/arms/glove_bloodhound/v_glove_bloodhound.mdl" } },
 	{ GLOVE_T_SIDE,{ "models/weapons/v_models/arms/glove_fingerless/v_glove_fingerless.mdl" } },
 	{ GLOVE_CT_SIDE,{ "models/weapons/v_models/arms/glove_hardknuckle/v_glove_hardknuckle.mdl" } },
@@ -43,7 +47,11 @@ const std::vector<WeaponName_t> k_knife_names =
 	{ WEAPON_KNIFE_FALCHION, "Falchion Knife" },
 	{ WEAPON_KNIFE_SURVIVAL_BOWIE, "Bowie Knife" },
 	{ WEAPON_KNIFE_BUTTERFLY, "Butterfly Knife" },
-	{ WEAPON_KNIFE_PUSH, "Shadow Daggers" }
+	{ WEAPON_KNIFE_PUSH, "Shadow Daggers" },
+	{ WEAPON_KNIFE_URSUS, "Ursus Knife"},
+	{ WEAPON_KNIFE_GYPSY_JACKKNIFE, "Navaja Knife" },
+	{ WEAPON_KNIFE_STILETTO, "Stiletto Knife" },
+	{ WEAPON_KNIFE_WIDOWMAKER, "Talon Knife" }
 };
 
 const std::vector<WeaponName_t> k_glove_names =
@@ -56,7 +64,8 @@ const std::vector<WeaponName_t> k_glove_names =
 	{ GLOVE_SLICK, "Slick" },
 	{ GLOVE_LEATHER_WRAP, "Handwrap" },
 	{ GLOVE_MOTORCYCLE, "Motorcycle" },
-	{ GLOVE_SPECIALIST, "Specialist" }
+	{ GLOVE_SPECIALIST, "Specialist" },
+	{ GLOVE_HYDRA, "Hydra"}
 };
 
 const std::vector<WeaponName_t> k_weapon_names =
@@ -216,6 +225,34 @@ const static std::unordered_map<std::string, int(*)(int)> animation_fix_map
 			return SEQUENCE_BOWIE_IDLE1;
 		default:
 			return sequence - 1;
+		}
+	} },
+	{ "models/weapons/v_knife_ursus.mdl", [](int sequence) -> int
+	{
+		switch (sequence)
+		{
+		case SEQUENCE_DEFAULT_DRAW:
+			return RandomSequence(SEQUENCE_BUTTERFLY_DRAW, SEQUENCE_BUTTERFLY_DRAW2);
+		case SEQUENCE_DEFAULT_LOOKAT01:
+			return RandomSequence(SEQUENCE_BUTTERFLY_LOOKAT01, 14);
+		default:
+			return sequence + 1;
+		}
+	} },
+	{ "models/weapons/v_knife_stiletto.mdl", [](int sequence) -> int
+	{
+		switch (sequence)
+		{
+		case SEQUENCE_DEFAULT_LOOKAT01:
+			return RandomSequence(12, 13);
+		}
+	} },
+	{ "models/weapons/v_knife_widowmaker.mdl", [](int sequence) -> int
+	{
+		switch (sequence)
+		{
+		case SEQUENCE_DEFAULT_LOOKAT01:
+			return RandomSequence(14, 15);
 		}
 	} }
 };

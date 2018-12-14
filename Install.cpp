@@ -138,7 +138,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_Localize = Iface::IfaceMngr::getIface<ILocalize>("localize.dll", "Localize_");
 
 	g_GlobalVars = **(CGlobalVarsBase***)((*(DWORD**)(g_CHLClient))[0] + 0x1B);
-	//g_Input = *(CInput**)((*(DWORD**)g_CHLClient)[15] + 0x1);
+	//g_Input = *(CInput**)((*(DWORD**)g_CHLClient)[16] + 0x1);
 	
 	g_ClientMode = **(IClientMode***)((*(DWORD**)g_CHLClient)[10] + 0x5);
 	g_pMemAlloc = *(IMemAlloc**)(GetProcAddress(GetModuleHandle("tier0.dll"), "g_pMemAlloc"));
@@ -157,7 +157,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	auto dwFireBullets = *(DWORD**)(Utils::PatternScan(client, "55 8B EC 51 53 56 8B F1 BB ? ? ? ? B8") + 0x131);
 
 	Offsets::lgtSmoke = (DWORD)Utils::PatternScan(client, "55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0");
-	Offsets::getSequenceActivity = (DWORD)Utils::PatternScan(client, "55 8B EC 83 7D 08 FF 56 8B F1 74 3D");
+	Offsets::getSequenceActivity = (DWORD)Utils::PatternScan(client, "55 8B EC 53 8B 5D 08 56 8B F1 83");
 	Offsets::smokeCount = *(DWORD*)(Utils::PatternScan(client, "55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0") + 0x8);
 	Offsets::invalidateBoneCache = (DWORD)Utils::PatternScan(client, "80 3D ? ? ? ? ? 74 16 A1 ? ? ? ? 48 C7 81");
 	Offsets::playerResource = *(DWORD*)(Utils::PatternScan(client, "8B 3D ? ? ? ? 85 FF 0F 84 ? ? ? ? 81 C7") + 2);
@@ -221,7 +221,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pD3DDevHook->Hook(42, Handlers::EndScene_h);
 	g_pD3DDevHook->Hook(16, Handlers::Reset_h);
 	g_pEngineClientHook->Hook(32, Handlers::IsBoxVisible_h);
-	g_pEngineClientHook->Hook(94, Handlers::IsHLTV_h);
+	g_pEngineClientHook->Hook(93, Handlers::IsHLTV_h);
 
 	o_SetMouseCodeState = g_pInputInternalHook->GetOriginal<SetMouseCodeState_t>(92);
 	o_SetKeyCodeState = g_pInputInternalHook->GetOriginal<SetKeyCodeState_t>(91);
@@ -240,7 +240,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	o_EndScene = g_pD3DDevHook->GetOriginal<EndScene_t>(42);
 	o_Reset = g_pD3DDevHook->GetOriginal<Reset_t>(16);
 	o_IsBoxVisible = g_pEngineClientHook->GetOriginal<IsBoxVisible_t>(32);
-	o_IsHLTV = g_pEngineClientHook->GetOriginal<IsHLTV_t>(94);
+	o_IsHLTV = g_pEngineClientHook->GetOriginal<IsHLTV_t>(93);
 	o_UnlockCursor = g_pVguiSurfHook->GetOriginal<CusorFunc_t>(66);
 	o_LockCursor = g_pVguiSurfHook->GetOriginal<CusorFunc_t>(67);
 

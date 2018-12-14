@@ -10,8 +10,6 @@
 
 void LagRecord::SaveRecord(C_BasePlayer *player)
 {
-	//CMBacktracking::Get().AnimationFix(player);
-
 	m_vecOrigin = player->m_vecOrigin();
 	m_vecAbsOrigin = player->GetAbsOrigin();
 	m_angAngles = player->m_angEyeAngles();
@@ -140,7 +138,7 @@ bool CMBacktracking::StartLagCompensation(C_BasePlayer *player)
 	{
 		for (auto it : m_LagRecords)
 		{
-			if (it.m_iPriority >= 1 || (it.m_vecVelocity.Length2D() > 35.f)) // let's account for those moving fags aswell -> it's experimental and not supposed what this lagcomp mode should do
+			if (it.m_iPriority >= 1 || (it.m_vecVelocity.Length2D() > 10.f)) // let's account for those moving fags aswell -> it's experimental and not supposed what this lagcomp mode should do
 				backtrack_records.emplace_back(it);
 		}
 		break;
@@ -202,12 +200,13 @@ bool CMBacktracking::FindViableRecord(C_BasePlayer *player, LagRecord* record)
 
 	if ((0 != idx) && (recentLR.m_vecOrigin - prevLR.m_vecOrigin).LengthSqr() > 4096.f)
 	{
-		float simulationTimeDelta = recentLR.m_flSimulationTime - prevLR.m_flSimulationTime;
+		/*float simulationTimeDelta = recentLR.m_flSimulationTime - prevLR.m_flSimulationTime;
 
 		int simulationTickDelta = clamp(TIME_TO_TICKS(simulationTimeDelta), 1, 15);
 
 		for (; simulationTickDelta > 0; simulationTickDelta--)
-			RebuildGameMovement::Get().FullWalkMove(player);
+			RebuildGameMovement::Get().FullWalkMove(player);*/
+		FakelagFix(player);
 
 		// Bandage fix so we "restore" to the lagfixed player.
 		m_RestoreLagRecord[player->EntIndex()].second.SaveRecord(player);
@@ -352,7 +351,7 @@ void CMBacktracking::SimulateMovement(Vector &velocity, Vector &origin, C_BasePl
 		flags |= (1 << 0);
 }
 
-void CMBacktracking::AnimationFix(C_BasePlayer *player)
+void CMBacktracking::FakelagFix(C_BasePlayer *player)
 {
 	// aw reversed; useless, you miss more with it than without it -> missing for sure other code parts
 	// to make this work lel
@@ -496,7 +495,7 @@ void CMBacktracking::RageBacktrack(C_BasePlayer* target, CUserCmd* usercmd, Vect
 
 			if (!iter->m_bMatrixBuilt)
 			{
-				if (!target->SetupBones(iter->matrix, 128, 256, iter->m_flSimulationTime))
+				if (!target->SetupBones2(iter->matrix, 128, 256, iter->m_flSimulationTime))
 					continue;
 
 				iter->m_bMatrixBuilt = true;
@@ -562,7 +561,7 @@ bool CMBacktracking::IsPlayerValid(C_BasePlayer *player)
 	if (!player->IsAlive())
 		return false;
 
-	if (player->m_iTeamNum() == g_LocalPlayer->m_iTeamNum())
+	if (player->IsTeamMate())
 		return false;
 
 	if (player->m_bGunGameImmunity())

@@ -243,6 +243,7 @@ public:
 	NETVAR(CHandle<C_BaseViewModel>, m_hViewModel, "CBasePlayer", "m_hViewModel[0]");
 	NETVAR(Vector, m_vecVelocity, "CBasePlayer", "m_vecVelocity[0]");
 	NETVAR(float_t, m_flSimulationTime, "CBaseEntity", "m_flSimulationTime");
+	NETVAR(int32_t, m_nSurvivalTeam, "CBaseEntity", "m_nSurvivalTeam");
 	NETVARADDOFFS(float_t, m_flOldSimulationTime, "CBaseEntity", "m_flSimulationTime", 0x4);
 	NETVAR(float_t, m_flDuckSpeed, "CCSPlayer", "m_flDuckSpeed");
 	NETVAR(float_t, m_flDuckAmount, "CCSPlayer", "m_flDuckAmount");
@@ -287,6 +288,14 @@ public:
 
 	float_t m_flSpawnTime();
 
+	bool IsTeamMate()
+	{
+		if (Utils::IsDangerZone())
+			return (g_LocalPlayer->m_nSurvivalTeam() == -1) ? false : (g_LocalPlayer->m_nSurvivalTeam() == this->m_nSurvivalTeam());
+		else
+			return this->m_iTeamNum() == g_LocalPlayer->m_iTeamNum();
+	}
+
 	std::array<float, 24> &m_flPoseParameter();
 	QAngle &visuals_Angles();
 	int32_t GetMoveType();
@@ -311,6 +320,8 @@ public:
 	void BuildTransformations(CStudioHdr *hdr, Vector *pos, Quaternion *q, const matrix3x4_t &cameraTransform, int32_t boneMask, byte *computed);
 
 	bool HandleBoneSetup(int32_t boneMask, matrix3x4_t *boneOut, float_t curtime);
+
+	bool SetupBones2(matrix3x4_t *pBoneToWorldOut, int nMaxBones, int boneMask, float currentTime);
 
 	const Vector WorldSpaceCenter();
 	Vector GetEyePos();

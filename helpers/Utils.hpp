@@ -18,6 +18,7 @@ namespace Utils
 	DWORD GetModuleBase(char *moduleName);
 	void RankRevealAll();
 	void IsReady();
+	bool IsDangerZone();
 	void SetClantag(const char *tag);
 	void LoadNamedSkys(const char *sky_name);
 	void RandomSeed(int iSeed);

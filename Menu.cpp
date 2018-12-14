@@ -292,8 +292,7 @@ namespace GladiatorMenu
 		style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.00f, 0.46f, 0.65f, 0.74f);
 		style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.00f, 0.46f, 0.65f, 1.00f);
 		style.Colors[ImGuiCol_ComboBg] = ImVec4(col_area.x, col_area.y, col_area.z, 1.00f);
-		style.Colors[ImGuiCol_CheckMark] = ImVec4(col_theme.x, col_theme.y, col_theme.z, 1.00f);
-		//		style.Colors[ImGuiCol_CheckMark] = ImVec4(0.00f, 0.46f, 0.65f, 1.00f);
+		style.Colors[ImGuiCol_CheckMark] = ImVec4(0.95f, 0.05f, 0.10f, 0.65f);
 		style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.00f, 0.46f, 0.65f, 1.00f);
 		style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.00f, 0.46f, 0.65f, 1.00f);
 		style.Colors[ImGuiCol_Button] = ImVec4(0.00f, 0.46f, 0.65f, 1.00f);
@@ -308,9 +307,9 @@ namespace GladiatorMenu
 		style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.30f);
 		style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(1.00f, 1.00f, 1.00f, 0.60f);
 		style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(1.00f, 1.00f, 1.00f, 0.90f);
-		style.Colors[ImGuiCol_CloseButton] = ImVec4(1.00f, 0.10f, 0.24f, 0.00f);
-		style.Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.00f, 0.10f, 0.24f, 0.00f);
-		style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(1.00f, 0.10f, 0.24f, 0.00f);
+		style.Colors[ImGuiCol_CloseButton] = ImVec4(0.85, 0.10, 0.10, 0.65f);
+		style.Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.85, 0.10, 0.10, 0.75f);
+		style.Colors[ImGuiCol_CloseButtonActive] = ImVec4(0.85, 0.10, 0.10, 0.85f);
 		style.Colors[ImGuiCol_PlotLines] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 		style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
 		style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
@@ -344,6 +343,7 @@ namespace GladiatorMenu
 		style.AntiAliasedLines = true;
 		style.AntiAliasedShapes = true;
 		style.CurveTessellationTol = 1.25f;
+		style.WindowPadThickness = 4.f;
 
 		d3dinit = true;
 		cheat_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\Arial.ttf", 13);
@@ -961,7 +961,10 @@ namespace GladiatorMenu
 	{
 		ImGui::BeginChild("SKINCHANGER", ImVec2(0, 0), true);
 		{
-			if (ImGui::Checkbox("Enabled##Skinchanger", &g_Options.skinchanger_enabled))
+			ImGui::Text("Structs have to be updated to make skinchanger work again. To lazy atm for it.");
+			ImGui::Text("The structs that are needing an update: C_WeaponCSBase, C_AttributeManager, C_EconItemView inside Structs.hpp");
+
+			/*if (ImGui::Checkbox("Enabled##Skinchanger", &g_Options.skinchanger_enabled))
 				Skinchanger::Get().bForceFullUpdate = true;
 
 			std::vector<EconomyItem_t> &entries = Skinchanger::Get().GetItems();
@@ -1129,7 +1132,7 @@ namespace GladiatorMenu
 
 			ImGui::PopItemWidth();
 			ImGui::Columns(1);
-
+			*/
 			ImGui::EndChild();
 		}
 	}
