@@ -264,7 +264,7 @@ Vector AimRage::CalculateBestPoint(C_BasePlayer *player, int prioritized, float 
 			HITBOX_PELVIS,
 			HITBOX_UPPER_CHEST,
 			HITBOX_CHEST,
-			HITBOX_LOWER_NECK,
+			HITBOX_NECK,
 			HITBOX_LEFT_FOREARM,
 			HITBOX_RIGHT_FOREARM,
 			HITBOX_RIGHT_HAND,
@@ -521,7 +521,6 @@ bool AimRage::SimulateFireBullet(C_BaseCombatWeapon *weap, FireBulletData &data,
 		{
 		case HITBOX_HEAD:
 		case HITBOX_NECK:
-		case HITBOX_LOWER_NECK:
 			return HITGROUP_HEAD;
 		case HITBOX_LOWER_CHEST:
 		case HITBOX_CHEST:
