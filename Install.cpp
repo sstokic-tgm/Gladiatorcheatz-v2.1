@@ -176,7 +176,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pVguiSurfHook = std::make_unique<ShadowVTManager>();
 	g_pClientModeHook = std::make_unique<ShadowVTManager>();
 	g_pPredictionHook = std::make_unique<ShadowVTManager>();
-	//g_pFireBulletHook = std::make_unique<VFTableHook>((PPDWORD)dwFireBullets, true);
+	g_pFireBulletHook = std::make_unique<ShadowVTManager>();
 	g_pMaterialSystemHook = std::make_unique<ShadowVTManager>();
 	g_pInputInternalHook = std::make_unique<ShadowVTManager>();
 	g_pConvarHook = std::make_unique<ShadowVTManager>();
@@ -184,6 +184,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pEngineClientHook = std::make_unique<ShadowVTManager>();
 	//g_pNetChannelHook = std::make_unique<ShadowVTManager>();
 
+	g_pFireBulletHook->Setup((PDWORD)dwFireBullets);
 	g_pDMEHook->Setup(g_MdlRender);
 	g_pD3DDevHook->Setup(D3DDevice9);
 	g_pClientHook->Setup(g_CHLClient);
@@ -203,6 +204,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 
 	//o_FireBullets = g_pFireBulletHook->Hook(7, (FireBullets_t)Handlers::TEFireBulletsPostDataUpdate_h);
 
+	g_pFireBulletHook->Hook(7, (FireBullets_t)Handlers::TEFireBulletsPostDataUpdate_h);
 	g_pInputInternalHook->Hook(92, Handlers::SetMouseCodeState_h);
 	g_pInputInternalHook->Hook(91, Handlers::SetKeyCodeState_h);
 	g_pClientModeHook->Hook(35, Handlers::GetViewModelFov_h);
@@ -223,6 +225,7 @@ unsigned long __stdcall Installer::installGladiator(void *unused)
 	g_pEngineClientHook->Hook(32, Handlers::IsBoxVisible_h);
 	g_pEngineClientHook->Hook(93, Handlers::IsHLTV_h);
 
+	o_FireBullets = g_pFireBulletHook->GetOriginal<FireBullets_t>(7);
 	o_SetMouseCodeState = g_pInputInternalHook->GetOriginal<SetMouseCodeState_t>(92);
 	o_SetKeyCodeState = g_pInputInternalHook->GetOriginal<SetKeyCodeState_t>(91);
 	o_GetViewmodelFov = g_pClientModeHook->GetOriginal<GetViewmodelFov_t>(35);
