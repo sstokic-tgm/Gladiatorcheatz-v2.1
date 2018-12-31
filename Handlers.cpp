@@ -846,25 +846,27 @@ void __stdcall FireBullets_PostDataUpdate(C_TEFireBullets *thisptr, DataUpdateTy
 	if (!g_LocalPlayer || !g_LocalPlayer->IsAlive())
 		return o_FireBullets(thisptr, updateType);
 
-	if (g_Options.hvh_resolver && g_Options.rage_lagcompensation && thisptr)
+	if (g_Options.rage_lagcompensation && thisptr)
 	{
 		int iPlayer = thisptr->m_iPlayer + 1;
 		if (iPlayer < 64)
 		{
 			auto player = C_BasePlayer::GetPlayerByIndex(iPlayer);
 			
-			if (player && player != g_LocalPlayer && !player->IsDormant() && player->m_iTeamNum() != g_LocalPlayer->m_iTeamNum())
+			if (player && player != g_LocalPlayer && !player->IsDormant() && !player->IsTeamMate())
 			{
+				QAngle eyeAngles = QAngle(thisptr->m_vecAngles.pitch, thisptr->m_vecAngles.yaw, thisptr->m_vecAngles.roll);
 				QAngle calcedAngle = Math::CalcAngle(player->GetEyePos(), g_LocalPlayer->GetEyePos());
-
-				player->m_angEyeAngles().pitch = calcedAngle.pitch;
-				player->m_angEyeAngles().yaw = calcedAngle.yaw;
-				player->m_angEyeAngles().roll = 0.f;
+				
+				thisptr->m_vecAngles.pitch = calcedAngle.pitch;
+				thisptr->m_vecAngles.yaw = calcedAngle.yaw;
+				thisptr->m_vecAngles.roll = 0.f;
 
 				float
 					event_time = g_GlobalVars->tickcount,
 					player_time = player->m_flSimulationTime();
 
+				// Extrapolate tick to hit scouters etc
 				auto lag_records = CMBacktracking::Get().m_LagRecord[iPlayer];
 
 				float shot_time = TICKS_TO_TIME(event_time);
@@ -883,13 +885,15 @@ void __stdcall FireBullets_PostDataUpdate(C_TEFireBullets *thisptr, DataUpdateTy
 						g_CVar->ConsolePrintf("Bad curtime difference, EVENT: %f, RECORD: %f\n", event_time, record.m_iTickCount);
 #endif
 				}
-#ifdef _DEBUG
-				g_CVar->ConsolePrintf("CURTIME_TICKOUNT: %f, SIMTIME: %f, CALCED_TIME: %f\n", event_time, player_time, shot_time);
-#endif
-				// gay
-				/*int32_t choked = floorf((TICKS_TO_TIME(event_time) - player_time) / g_GlobalVars->interval_per_tick) + 0.5;
-				choked = (choked > 14 ? 14 : choked < 1 ? 0 : choked);
-				player->m_vecOrigin() = (lag_records.begin()->m_vecOrigin + (g_GlobalVars->interval_per_tick * lag_records.begin()->m_vecVelocity * choked));*/
+//#ifdef _DEBUG
+				g_CVar->ConsolePrintf("Calced angs: %f %f, Event angs: %f %f, CURTIME_TICKOUNT: %f, SIMTIME: %f, CALCED_TIME: %f\n", calcedAngle.pitch, calcedAngle.yaw, eyeAngles.pitch, eyeAngles.yaw, event_time, player_time, shot_time);
+//#endif
+				/*if (!lag_records.empty())
+				{
+					int choked = floorf((event_time - player_time) / g_GlobalVars->interval_per_tick) + 0.5;
+					choked = (choked > 14 ? 14 : choked < 1 ? 0 : choked);
+					player->m_vecOrigin() = (lag_records.begin()->m_vecOrigin + (g_GlobalVars->interval_per_tick * lag_records.begin()->m_vecVelocity * choked));
+				}*/
 
 				CMBacktracking::Get().SetOverwriteTick(player, calcedAngle, shot_time, 1);
 			}
@@ -960,63 +964,63 @@ bool __fastcall Handlers::TempEntities_h(void* ECX, void* EDX, void* msg)
 			// set fire_delay to zero to send out event so its not here later.
 			ei->fire_delay = 0.0f;
 
-			auto pRecvTable = ei->pClientClass->m_pRecvTable;
-			void *BasePtr = pCE->GetDataTableBasePtr();
-
-			// Decode data into client event object and use the DTBasePtr to get the netvars
-			CL_ParseEventDelta(ei->pData, BasePtr, pRecvTable);
-
-			if (!BasePtr)
-				continue;
-
-			// This nigga right HERE just fired a BULLET MANE
-			int EntityIndex = *(int*)((uintptr_t)BasePtr + 0x10) + 1;
-
-			auto pEntity = (C_BasePlayer*)g_EntityList->GetClientEntity(EntityIndex);
-			if (pEntity && pEntity->GetClientClass() &&  pEntity->GetClientClass()->m_ClassID == ClassId::ClassId_CCSPlayer && pEntity->m_iTeamNum() != g_LocalPlayer->m_iTeamNum())
-			{
-				QAngle EyeAngles = QAngle(*(float*)((uintptr_t)BasePtr + 0x24), *(float*)((uintptr_t)BasePtr + 0x28), 0.0f),
-					CalcedAngle = Math::CalcAngle(pEntity->GetEyePos(), g_LocalPlayer->GetEyePos());
-
-				*(float*)((uintptr_t)BasePtr + 0x24) = CalcedAngle.pitch;
-				*(float*)((uintptr_t)BasePtr + 0x28) = CalcedAngle.yaw;
-				*(float*)((uintptr_t)BasePtr + 0x2C) = 0;
-
-				float
-					event_time = TICKS_TO_TIME(g_GlobalVars->tickcount),
-					player_time = pEntity->m_flSimulationTime();
-
-				// Extrapolate tick to hit scouters etc
-				auto lag_records = CMBacktracking::Get().m_LagRecord[pEntity->EntIndex()];
-
-				float shot_time = event_time;
-				for (auto& record : lag_records)
-				{
-					if (TICKS_TO_TIME(record.m_iTickCount) <= event_time)
-					{
-						shot_time = record.m_flSimulationTime + (event_time - TICKS_TO_TIME(record.m_iTickCount)); // also get choked from this
-#ifdef _DEBUG
-						g_CVar->ConsoleColorPrintf(Color(0, 255, 0, 255), "Found exact shot time: %f, ticks choked to get here: %d\n", shot_time, TIME_TO_TICKS(event_time - TICKS_TO_TIME(record.m_iTickCount)));
-#endif
-						break;
-					}
-#ifdef _DEBUG
-					else
-						g_CVar->ConsolePrintf("Bad curtime difference, EVENT: %f, RECORD: %f\n", event_time, TICKS_TO_TIME(record.m_iTickCount));
-#endif
-				}
-#ifdef _DEBUG
-				g_CVar->ConsolePrintf("Calced angs: %f %f, Event angs: %f %f, CURTIME_TICKOUNT: %f, SIMTIME: %f, CALCED_TIME: %f\n", CalcedAngle.pitch, CalcedAngle.yaw, EyeAngles.pitch, EyeAngles.yaw, event_time, player_time, shot_time);
-#endif
-				if (!lag_records.empty())
-				{
-					int choked = floorf((event_time - player_time) / g_GlobalVars->interval_per_tick) + 0.5;
-					choked = (choked > 14 ? 14 : choked < 1 ? 0 : choked);
-					pEntity->m_vecOrigin() = (lag_records.begin()->m_vecOrigin + (g_GlobalVars->interval_per_tick * lag_records.begin()->m_vecVelocity * choked));
-				}
-
-				CMBacktracking::Get().SetOverwriteTick(pEntity, CalcedAngle, shot_time, 1);
-			}
+//			auto pRecvTable = ei->pClientClass->m_pRecvTable;
+//			void *BasePtr = pCE->GetDataTableBasePtr();
+//
+//			// Decode data into client event object and use the DTBasePtr to get the netvars
+//			CL_ParseEventDelta(ei->pData, BasePtr, pRecvTable);
+//
+//			if (!BasePtr)
+//				continue;
+//
+//			// This nigga right HERE just fired a BULLET MANE
+//			int EntityIndex = *(int*)((uintptr_t)BasePtr + 0x10) + 1;
+//
+//			auto pEntity = (C_BasePlayer*)g_EntityList->GetClientEntity(EntityIndex);
+//			if (pEntity && pEntity->GetClientClass() &&  pEntity->GetClientClass()->m_ClassID == ClassId::ClassId_CCSPlayer && !pEntity->IsTeamMate())
+//			{
+//				QAngle EyeAngles = QAngle(*(float*)((uintptr_t)BasePtr + 0x24), *(float*)((uintptr_t)BasePtr + 0x28), 0.0f),
+//					CalcedAngle = Math::CalcAngle(pEntity->GetEyePos(), g_LocalPlayer->GetEyePos());
+//
+//				*(float*)((uintptr_t)BasePtr + 0x24) = CalcedAngle.pitch;
+//				*(float*)((uintptr_t)BasePtr + 0x28) = CalcedAngle.yaw;
+//				*(float*)((uintptr_t)BasePtr + 0x2C) = 0;
+//
+//				float
+//					event_time = TICKS_TO_TIME(g_GlobalVars->tickcount),
+//					player_time = pEntity->m_flSimulationTime();
+//
+//				// Extrapolate tick to hit scouters etc
+//				auto lag_records = CMBacktracking::Get().m_LagRecord[pEntity->EntIndex()];
+//
+//				float shot_time = event_time;
+//				for (auto& record : lag_records)
+//				{
+//					if (TICKS_TO_TIME(record.m_iTickCount) <= event_time)
+//					{
+//						shot_time = record.m_flSimulationTime + (event_time - TICKS_TO_TIME(record.m_iTickCount)); // also get choked from this
+//#ifdef _DEBUG
+//						g_CVar->ConsoleColorPrintf(Color(0, 255, 0, 255), "Found exact shot time: %f, ticks choked to get here: %d\n", shot_time, TIME_TO_TICKS(event_time - TICKS_TO_TIME(record.m_iTickCount)));
+//#endif
+//						break;
+//					}
+//#ifdef _DEBUG
+//					else
+//						g_CVar->ConsolePrintf("Bad curtime difference, EVENT: %f, RECORD: %f\n", event_time, TICKS_TO_TIME(record.m_iTickCount));
+//#endif
+//				}
+//#ifdef _DEBUG
+//				g_CVar->ConsolePrintf("Calced angs: %f %f, Event angs: %f %f, CURTIME_TICKOUNT: %f, SIMTIME: %f, CALCED_TIME: %f\n", CalcedAngle.pitch, CalcedAngle.yaw, EyeAngles.pitch, EyeAngles.yaw, event_time, player_time, shot_time);
+//#endif
+//				if (!lag_records.empty())
+//				{
+//					int choked = floorf((event_time - player_time) / g_GlobalVars->interval_per_tick) + 0.5;
+//					choked = (choked > 14 ? 14 : choked < 1 ? 0 : choked);
+//					pEntity->m_vecOrigin() = (lag_records.begin()->m_vecOrigin + (g_GlobalVars->interval_per_tick * lag_records.begin()->m_vecVelocity * choked));
+//				}
+//
+//				CMBacktracking::Get().SetOverwriteTick(pEntity, CalcedAngle, shot_time, 1);
+//			}
 		}
 		ei = next;
 	} while (next != NULL);
