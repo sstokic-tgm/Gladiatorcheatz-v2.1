@@ -272,7 +272,7 @@ void Resolver::Override()
 
 		float_t new_yaw = yawCorrection;
 
-		Math::ClampYaw(new_yaw);
+		new_yaw = Math::ClampYaw(new_yaw);
 
 		nearest_player->m_angEyeAngles().yaw += new_yaw;
 	}
