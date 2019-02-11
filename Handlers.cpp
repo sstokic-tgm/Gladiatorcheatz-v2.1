@@ -651,27 +651,10 @@ void __stdcall Handlers::OverrideView_h(CViewSetup* pSetup)
 
 void Proxies::didSmokeEffect(const CRecvProxyData *pData, void *pStruct, void *pOut)
 {
-	if (g_Options.removals_smoke_type == 0)
-		*(bool*)((DWORD)pOut + 0x1) = true;
-
-	std::vector<const char*> wireframesmoke_mats =
-	{
-		"particle/vistasmokev1/vistasmokev1_emods",
-		"particle/vistasmokev1/vistasmokev1_emods_impactdust",
-		"particle/vistasmokev1/vistasmokev1_fire",
-		"particle/vistasmokev1/vistasmokev1_smokegrenade",
-	};
-
-	if (g_Options.removals_smoke_type == 1)
-	{
-		for (auto smoke_mat : wireframesmoke_mats)
-		{
-			IMaterial* mat = g_MatSystem->FindMaterial(smoke_mat, TEXTURE_GROUP_OTHER);
-			mat->SetMaterialVarFlag(MATERIAL_VAR_WIREFRAME, true);
-		}
-	}
-
-	o_didSmokeEffect(pData, pStruct, pOut);
+    if (g_Options.removals_smoke)
+        *(bool*)((DWORD)pOut + 0x1) = true;
+ 
+    o_didSmokeEffect(pData, pStruct, pOut);
 }
 
 bool __stdcall Handlers::InPrediction_h()
