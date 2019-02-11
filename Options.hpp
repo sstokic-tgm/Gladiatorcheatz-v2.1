@@ -61,7 +61,6 @@ public:
 	OPTION(bool, removals_postprocessing, false);
 	OPTION(bool, removals_flash, false);
 	OPTION(bool, removals_smoke, false);
-	OPTION(int, removals_smoke_type, 0);
 
 #ifdef NIGHTMODE
 	OPTION(bool, visuals_others_nightmode, false);
