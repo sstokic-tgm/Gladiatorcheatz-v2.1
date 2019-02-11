@@ -715,11 +715,7 @@ namespace GladiatorMenu
 				ImGui::Columns(1, NULL, true);
 				{
 					ImGui::Checkbox("Flash##Removals", &g_Options.removals_flash);
-					ImGui::Checkbox("Smoke##Removals", &g_Options.removals_smoke);
-					if (g_Options.removals_smoke)
-					{
-						ImGui::Combo("Smoke Type##Removals", &g_Options.removals_smoke_type, opt_nosmoketype, 2);
-					}
+					ImGui::Checkbox("Smoke##Removals", &g_Options.removals_smoke);					
 					ImGui::Checkbox("Scope##Removals", &g_Options.removals_scope);
 					ImGui::Checkbox("Recoil##Removals", &g_Options.removals_novisualrecoil);
 					ImGui::Checkbox("Post-processing##Removals", &g_Options.removals_postprocessing);
@@ -964,7 +960,7 @@ namespace GladiatorMenu
 			ImGui::Text("Structs have to be updated to make skinchanger work again. To lazy atm for it.");
 			ImGui::Text("The structs that are needing an update: C_WeaponCSBase, C_AttributeManager, C_EconItemView inside Structs.hpp");
 
-			/*if (ImGui::Checkbox("Enabled##Skinchanger", &g_Options.skinchanger_enabled))
+			if (ImGui::Checkbox("Enabled##Skinchanger", &g_Options.skinchanger_enabled))
 				Skinchanger::Get().bForceFullUpdate = true;
 
 			std::vector<EconomyItem_t> &entries = Skinchanger::Get().GetItems();
@@ -1132,7 +1128,7 @@ namespace GladiatorMenu
 
 			ImGui::PopItemWidth();
 			ImGui::Columns(1);
-			*/
+			
 			ImGui::EndChild();
 		}
 	}
