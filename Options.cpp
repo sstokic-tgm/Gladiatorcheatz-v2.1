@@ -14,7 +14,6 @@ const char *opt_AAyaw[] = { "Off", "Backwards", "Backwards Jitter", "Keybased", 
 const char *opt_AAfakeyaw[] = { "Off", "Backwards", "Backwards Jitter", "Evade", "Keybased", "Keybased Jitter" };
 const char *opt_LagCompType[] = { "Only best records", "Best and newest", "All records (fps warning)" };
 const char *opt_Skynames[] = { "Default", "cs_baggage_skybox_", "cs_tibet", "embassy", "italy", "jungle", "nukeblank", "office", "sky_csgo_cloudy01", "sky_csgo_night02", "sky_csgo_night02b", "sky_dust", "sky_venice", "vertigo", "vietnam" };
-const char *opt_nosmoketype[] = { "Remove", "Wireframe" };
 int realAimSpot[] = { 8, 7, 6, 0 };
 int realHitboxSpot[] = { 0, 1, 2, 3 };
 bool input_shouldListen = false;
