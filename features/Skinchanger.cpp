@@ -556,18 +556,7 @@ void Skinchanger::Work()
 
 void Skinchanger::ForceItemUpdates()
 {
-	auto local = C_BasePlayer::GetPlayerByIndex(g_EngineClient->GetLocalPlayer());
-	if (local)
-	{
-		auto weapons = local->m_hMyWeapons();
-
-		for (size_t i = 0; weapons[i].IsValid(); i++)
-		{
-			auto weapon = weapons[i].Get();
-
-			ForceItemUpdate(reinterpret_cast<C_WeaponCSBase*>(weapon));
-		}
-	}
+	g_ClientState->ForceFullUpdate();
 }
 
 using json = nlohmann::json;
