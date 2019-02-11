@@ -46,7 +46,6 @@ void Config::SaveConfig(const std::string path)
 	Save(g_Options.misc_logevents, "misc_logevents");
 	Save(g_Options.removals_flash, "removals_flash");
 	Save(g_Options.removals_smoke, "removals_smoke");
-	Save(g_Options.removals_smoke_type, "removals_smoke_type");
 	Save(g_Options.removals_scope, "removals_scope");
 	Save(g_Options.removals_novisualrecoil, "removals_novisualrecoil");
 	Save(g_Options.removals_postprocessing, "removals_postprocessing");
@@ -182,7 +181,6 @@ void Config::LoadConfig(const std::string path)
 	Load(g_Options.misc_logevents, "misc_logevents");
 	Load(g_Options.removals_flash, "removals_flash");
 	Load(g_Options.removals_smoke, "removals_smoke");
-	Load(g_Options.removals_smoke_type, "removals_smoke_type");
 	Load(g_Options.removals_scope, "removals_scope");
 	Load(g_Options.removals_novisualrecoil, "removals_novisualrecoil");
 	Load(g_Options.removals_postprocessing, "removals_postprocessing");
