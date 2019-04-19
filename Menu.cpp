@@ -961,10 +961,10 @@ namespace GladiatorMenu
 	{
 		ImGui::BeginChild("SKINCHANGER", ImVec2(0, 0), true);
 		{
-			ImGui::Text("Structs have to be updated to make skinchanger work again. To lazy atm for it.");
-			ImGui::Text("The structs that are needing an update: C_WeaponCSBase, C_AttributeManager, C_EconItemView inside Structs.hpp");
+			//ImGui::Text("Structs have to be updated to make skinchanger work again. To lazy atm for it.");
+			//ImGui::Text("The structs that are needing an update: C_WeaponCSBase, C_AttributeManager, C_EconItemView inside Structs.hpp");
 
-			/*if (ImGui::Checkbox("Enabled##Skinchanger", &g_Options.skinchanger_enabled))
+			if (ImGui::Checkbox("Enabled##Skinchanger", &g_Options.skinchanger_enabled))
 				Skinchanger::Get().bForceFullUpdate = true;
 
 			std::vector<EconomyItem_t> &entries = Skinchanger::Get().GetItems();
@@ -1132,7 +1132,7 @@ namespace GladiatorMenu
 
 			ImGui::PopItemWidth();
 			ImGui::Columns(1);
-			*/
+			
 			ImGui::EndChild();
 		}
 	}

@@ -275,6 +275,18 @@ public:
 		return *(Vector*)((uintptr_t)this + _m_vecBaseVelocity);
 	}
 
+	Vector &m_vecAbsVelocity()
+	{
+		static unsigned int _m_vecAbsVelocity = Utils::FindInDataMap(GetPredDescMap(), "m_vecAbsVelocity");
+		return *(Vector*)((uintptr_t)this + _m_vecAbsVelocity);
+	}
+
+	uint32_t &m_iEFlags()
+	{
+		static unsigned int _m_iEFlags = Utils::FindInDataMap(GetPredDescMap(), "m_iEFlags");
+		return *(uint32_t*)((uintptr_t)this + _m_iEFlags);
+	}
+
 	float_t &m_flMaxspeed()
 	{
 		static unsigned int _m_flMaxspeed = Utils::FindInDataMap(GetPredDescMap(), "m_flMaxspeed");
@@ -408,9 +420,14 @@ public:
 		return *(Vector*)((uintptr_t)this + 0xC8);
 	}
 
-	float_t m_flVelocity()
+	float_t &m_flVelocity()
 	{
 		return *(float_t*)((uintptr_t)this + 0xEC);
+	}
+
+	bool &m_bOnGround()
+	{
+		return *(bool*)((uintptr_t)this + 0x108);
 	}
 
 	char pad_0x0000[0x344]; //0x0000
@@ -419,33 +436,28 @@ public:
 class C_EconItemView
 {
 public:
-	char _pad_0x0000[0x14];
-	CUtlVector<IRefCounted*>	m_CustomMaterials; //0x0014
-	char _pad_0x0028[0x1F8];
-	CUtlVector<IRefCounted*>	m_VisualsDataProcessors; //0x0220
+	char pad_0000[4]; //0x0000
+	CUtlVector<IRefCounted*> m_CustomMaterials; //0x0004
+	char pad_0018[520]; //0x0018
+	CUtlVector<IRefCounted*> m_VisualsDataProcessors; //0x0220
 };
 
 class C_AttributeManager
 {
 public:
-	char	_pad_0x0000[0x18];
-	__int32						m_iReapplyProvisionParity; //0x0018 
-	uintptr_t						m_hOuter; //0x001C 
-	char	_pad_0x0020[0x4];
-	__int32						m_ProviderType; //0x0024 
-	char	_pad_0x0028[0x18];
-	C_EconItemView				m_Item; //0x0040 
+	char pad_0000[64]; //0x0000
+	C_EconItemView m_Item; //0x0040
 };
 
 class C_WeaponCSBase : public IClientEntity
 {
 public:
-	char	_pad_0x0000[0x09CC];
-	CUtlVector<IRefCounted*>	m_CustomMaterials; //0x09DC
-	char	_pad_0x09F0[0x2380];
-	C_AttributeManager			m_AttributeManager; //0x2D70
-	char	_pad_0x2D84[0x2F9];
-	bool						m_bCustomMaterialInitialized; //0x32DD
+	char _pad_0x0000[2508];
+	CUtlVector<IRefCounted*> m_CustomMaterials; //0x09DC
+	char _pad_0x09F0[9120];
+	C_AttributeManager m_AttributeManager; //0x2D80
+	char _pad_0x2D94[812];
+	bool m_bCustomMaterialInitialized; //0x3330
 };
 
 struct Item_t

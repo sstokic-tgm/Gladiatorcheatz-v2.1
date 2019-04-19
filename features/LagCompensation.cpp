@@ -72,6 +72,7 @@ void CMBacktracking::FrameUpdatePostEntityThink()
 				continue;
 		}
 
+		UpdateAnimations(player); // update animations
 		cur_lagrecord.SaveRecord(player); // first let's create the record
 
 		if (!lag_records.empty()) // apply specific stuff that is needed
@@ -353,43 +354,7 @@ void CMBacktracking::SimulateMovement(Vector &velocity, Vector &origin, C_BasePl
 
 void CMBacktracking::FakelagFix(C_BasePlayer *player)
 {
-	// aw reversed; useless, you miss more with it than without it -> missing for sure other code parts
-	// to make this work lel
-	
 	auto &lag_records = this->m_LagRecord[player->EntIndex()];
-
-	auto leet = [](C_BasePlayer *player) -> void
-	{
-		static ConVar *sv_pvsskipanimation = g_CVar->FindVar("sv_pvsskipanimation");
-
-		int32_t backup_sv_pvsskipanimation = sv_pvsskipanimation->GetInt();
-		sv_pvsskipanimation->SetValue(0);
-
-		*(int32_t*)((uintptr_t)player + 0xA30) = 0;
-		*(int32_t*)((uintptr_t)player + 0x269C) = 0;
-
-		int32_t backup_effects = *(int32_t*)((uintptr_t)player + 0xEC);
-		*(int32_t*)((uintptr_t)player + 0xEC) |= 8;
-
-		player->SetupBones(NULL, -1, 0x7FF00, g_GlobalVars->curtime);
-
-		*(int32_t*)((uintptr_t)player + 0xEC) = backup_effects;
-		sv_pvsskipanimation->SetValue(backup_sv_pvsskipanimation);
-	};
-
-	// backup
-	const float curtime = g_GlobalVars->curtime;
-	const float frametime = g_GlobalVars->frametime;
-
-	static auto host_timescale = g_CVar->FindVar(("host_timescale"));
-
-	g_GlobalVars->frametime = g_GlobalVars->interval_per_tick * host_timescale->GetFloat();
-	g_GlobalVars->curtime = player->m_flOldSimulationTime() + g_GlobalVars->interval_per_tick;
-
-	Vector backup_origin = player->m_vecOrigin();
-	Vector backup_absorigin = player->GetAbsOrigin();
-	Vector backup_velocity = player->m_vecVelocity();
-	int backup_flags = player->m_fFlags();
 
 	if (lag_records.size() > 2)
 	{
@@ -427,32 +392,67 @@ void CMBacktracking::FakelagFix(C_BasePlayer *player)
 				player->m_fFlags() |= 1;
 		}
 	}
+}
 
-	AnimationLayer backup_layers[15];
-	std::memcpy(backup_layers, player->GetAnimOverlays(), (sizeof(AnimationLayer) * player->GetNumAnimOverlays()));
-
-	// invalidates prior animations so the entity gets animated on our client 100% via UpdateClientSideAnimation
+void CMBacktracking::UpdateAnimations(C_BasePlayer *player)
+{
 	C_CSGOPlayerAnimState *state = player->GetPlayerAnimState();
 	if (state)
-		state->m_iLastClientSideAnimationUpdateFramecount() = g_GlobalVars->framecount - 1;
+	{
+		// backup
+		const float curtime = g_GlobalVars->curtime;
+		const float frametime = g_GlobalVars->frametime;
 
-	player->m_bClientSideAnimation() = true;
+		static auto host_timescale = g_CVar->FindVar(("host_timescale"));
 
-	// updates local animations + poses + calculates new abs angle based on eyeangles and other stuff
-	player->UpdateClientSideAnimation();
+		g_GlobalVars->frametime = g_GlobalVars->interval_per_tick * host_timescale->GetFloat();
+		g_GlobalVars->curtime = player->m_flOldSimulationTime() + g_GlobalVars->interval_per_tick;
 
-	player->m_bClientSideAnimation() = false;
+		Vector backup_origin = player->m_vecOrigin();
+		Vector backup_absorigin = player->GetAbsOrigin();
+		Vector backup_velocity = player->m_vecVelocity();
+		int backup_flags = player->m_fFlags();
+		int backup_eflags = player->m_iEFlags();
 
-	// restore
-	std::memcpy(player->GetAnimOverlays(), backup_layers, (sizeof(AnimationLayer) * player->GetNumAnimOverlays()));
-	player->m_vecOrigin() = backup_origin;
-	player->SetAbsOrigin(backup_absorigin);
-	player->m_vecVelocity() = backup_velocity;
-	player->m_fFlags() = backup_flags;
-	g_GlobalVars->curtime = curtime;
-	g_GlobalVars->frametime = frametime;
+		AnimationLayer backup_layers[15];
+		std::memcpy(backup_layers, player->GetAnimOverlays(), (sizeof(AnimationLayer) * player->GetNumAnimOverlays()));
 
-	leet(player);
+		if (state->m_bOnGround())
+		{
+			player->m_fFlags() |= FL_ONGROUND;
+		}
+		else
+		{
+			player->m_fFlags() &= ~FL_ONGROUND;
+		}
+		player->m_iEFlags() &= ~0x1000;
+
+		player->m_vecAbsVelocity() = player->m_vecVelocity();
+
+		// invalidates prior animations so the entity gets animated on our client 100% via UpdateClientSideAnimation
+		if (state->m_iLastClientSideAnimationUpdateFramecount() == g_GlobalVars->framecount)
+			state->m_iLastClientSideAnimationUpdateFramecount() = g_GlobalVars->framecount - 1;
+
+		player->m_bClientSideAnimation() = true;
+
+		// updates local animations + poses + calculates new abs angle based on eyeangles and other stuff
+		player->UpdateClientSideAnimation();
+
+		player->m_bClientSideAnimation() = false;
+
+		// restore
+		std::memcpy(player->GetAnimOverlays(), backup_layers, (sizeof(AnimationLayer) * player->GetNumAnimOverlays()));
+		player->m_vecOrigin() = backup_origin;
+		player->SetAbsOrigin(backup_absorigin);
+		player->m_vecVelocity() = backup_velocity;
+		player->m_fFlags() = backup_flags;
+		player->m_iEFlags() = backup_eflags;
+
+		g_GlobalVars->curtime = curtime;
+		g_GlobalVars->frametime = frametime;
+
+		player->SetupBones2(nullptr, -1, 0x7FF00, g_GlobalVars->curtime);
+	}
 }
 
 void CMBacktracking::SetOverwriteTick(C_BasePlayer *player, QAngle angles, float_t correct_time, uint32_t priority)

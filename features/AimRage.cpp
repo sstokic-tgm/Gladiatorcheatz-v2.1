@@ -566,7 +566,7 @@ bool AimRage::SimulateFireBullet(C_BaseCombatWeapon *weap, FireBulletData &data,
 		Vector end = data.src + data.direction * data.trace_length_remaining;
 
 		traceIt(data.src, end, MASK_SHOT | CONTENTS_GRATE, g_LocalPlayer, &data.enter_trace);
-		ClipTraceToPlayers(data.src, end + data.direction * 40.f, MASK_SHOT | CONTENTS_GRATE, &data.filter, &data.enter_trace);
+		ClipTraceToPlayers(player, data.src, end + data.direction * 40.f, MASK_SHOT | CONTENTS_GRATE, &data.filter, &data.enter_trace);
 
 		if (data.enter_trace.fraction == 1.0f)
 		{
@@ -791,7 +791,7 @@ bool AimRage::IsBreakableEntity(C_BasePlayer *ent)
 		return false;
 }
 
-void AimRage::ClipTraceToPlayers(const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, ITraceFilter *filter, CGameTrace *tr)
+void AimRage::ClipTraceToPlayers(C_BasePlayer *player, const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, ITraceFilter *filter, CGameTrace *tr)
 {
 	trace_t playerTrace;
 	Ray_t ray;
@@ -800,20 +800,19 @@ void AimRage::ClipTraceToPlayers(const Vector &vecAbsStart, const Vector &vecAbs
 
 	ray.Init(vecAbsStart, vecAbsEnd);
 
-	for (int i = 1; i <= g_GlobalVars->maxClients; i++)
+	if (!player || !player->IsAlive() || player->IsDormant())
 	{
-		C_BasePlayer *player = C_BasePlayer::GetPlayerByIndex(i);
+		return;
+	}
 
-		if (!player || !player->IsAlive() || player->IsDormant())
-			continue;
+	if (filter && filter->ShouldHitEntity(player, mask) == false)
+	{
+		return;
+	}
 
-		if (filter && filter->ShouldHitEntity(player, mask) == false)
-			continue;
-
-		float range = Math::DistanceToRay(player->WorldSpaceCenter(), vecAbsStart, vecAbsEnd);
-		if (range < 0.0f || range > maxRange)
-			continue;
-
+	float range = Math::DistanceToRay(player->WorldSpaceCenter(), vecAbsStart, vecAbsEnd);
+	if (range >= 0.0f || range <= maxRange)
+	{
 		g_EngineTrace->ClipRayToEntity(ray, mask | CONTENTS_HITBOX, player, &playerTrace);
 		if (playerTrace.fraction < smallestFraction)
 		{

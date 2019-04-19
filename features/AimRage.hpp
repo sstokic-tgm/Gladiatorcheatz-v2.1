@@ -43,7 +43,7 @@ public:
 	bool HandleBulletPenetration(WeapInfo_t *wpn_data, FireBulletData &data);
 	bool TraceToExit(Vector &end, CGameTrace *enter_trace, Vector start, Vector dir, CGameTrace *exit_trace);
 	bool IsBreakableEntity(C_BasePlayer *ent);
-	void ClipTraceToPlayers(const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, ITraceFilter *filter, CGameTrace *tr);
+	void ClipTraceToPlayers(C_BasePlayer *player, const Vector &vecAbsStart, const Vector &vecAbsEnd, unsigned int mask, ITraceFilter *filter, CGameTrace *tr);
 	bool IsArmored(C_BasePlayer *player, int armorVal, int hitgroup);
 
 	void traceIt(Vector &vecAbsStart, Vector &vecAbsEnd, unsigned int mask, C_BasePlayer *ign, CGameTrace *tr);
