@@ -186,10 +186,13 @@ void __fastcall Handlers::PaintTraverse_h(void *thisptr, void*, unsigned int vgu
 						if (g_Options.esp_player_skelet) Visuals::RenderSkelet();
 						if (g_Options.esp_backtracked_player_skelet) Visuals::RenderBacktrackedSkelet();
 						if (g_Options.esp_player_anglelines) Visuals::DrawAngleLines();
-						if (g_Options.hvh_resolver) Visuals::DrawResolverModes();
+						if (g_Options.esp_flags) Visuals::DrawFlags();
 
 						debug_visuals();						
 					}
+
+					/*draw even if box isn't drawing*/
+					if (g_Options.esp_pov) Visuals::DrawPoV(); 
 				}
 				else if (g_Options.esp_dropped_weapons && entity->IsWeapon())
 					Visuals::RenderWeapon((C_BaseCombatWeapon*)entity);
@@ -199,6 +202,8 @@ void __fastcall Handlers::PaintTraverse_h(void *thisptr, void*, unsigned int vgu
 
 				Visuals::RenderNadeEsp((C_BaseCombatWeapon*)entity);
 			}
+			//Visuals::ModulateWorld();
+
 			ServerSound::Get().Finish();
 
 			if (g_Options.removals_scope && (g_LocalPlayer && g_LocalPlayer->m_hActiveWeapon().Get() && g_LocalPlayer->m_hActiveWeapon().Get()->IsSniper() && g_LocalPlayer->m_bIsScoped()))
@@ -921,7 +926,9 @@ bool __fastcall Handlers::TempEntities_h(void* ECX, void* EDX, void* msg)
 
 	bool ret = o_TempEntities(ECX, msg);
 
-	auto CL_ParseEventDelta = [](void *RawData, void *pToData, RecvTable *pRecvTable)
+	/*never used, so we fix those peoples compiling problems :)*/
+
+	/*auto CL_ParseEventDelta = [](void *RawData, void *pToData, RecvTable *pRecvTable) 
 	{
 		// "RecvTable_DecodeZeros: table '%s' missing a decoder.", look at the function that calls it.
 		static uintptr_t CL_ParseEventDeltaF = (uintptr_t)Utils::PatternScan(GetModuleHandle("engine.dll"), ("55 8B EC 83 E4 F8 53 57"));
@@ -933,7 +940,7 @@ bool __fastcall Handlers::TempEntities_h(void* ECX, void* EDX, void* msg)
 			call    CL_ParseEventDeltaF
 			add     esp, 4
 		}
-	};
+	};*/
 
 	// Filtering events
 	if (!g_Options.rage_lagcompensation || !g_LocalPlayer->IsAlive())
