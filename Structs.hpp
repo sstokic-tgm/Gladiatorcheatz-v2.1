@@ -350,6 +350,17 @@ public:
 	void SetAbsAngles(const QAngle &angles);
 	void UpdateClientSideAnimation();
 	int GetPing();
+
+	char* GetArmorName()
+	{
+		if (this->m_ArmorValue() > 0)
+		{
+			if (this->m_bHasHelmet())
+				return "H+K";
+			else
+				return "K";
+		}
+	}
 };
 
 class C_BaseViewModel : public C_BaseEntity

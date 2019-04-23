@@ -662,6 +662,16 @@ namespace GladiatorMenu
 					ImGui::Checkbox("Name##ESP", &g_Options.esp_player_name);
 					ImGui::Checkbox("Health##ESP", &g_Options.esp_player_health);
 					ImGui::Checkbox("Weapon Name##ESP", &g_Options.esp_player_weapons);
+					ImGui::Checkbox("Flags##ESP", &g_Options.esp_flags);
+					ImGui::Checkbox("PoV arrows", &g_Options.esp_pov); 
+					ImGui::ColorPickerBox("##Pov_Color", g_Options.esp_pov_color_ct, g_Options.esp_pov_color_t, g_Options.esp_pov_color_ct_visible, g_Options.esp_pov_color_t_visible);
+
+					if (g_Options.esp_pov)
+					{
+						ImGui::SliderInt("PoV size", &g_Options.esp_pov_size, 10, 30, "%.0fpx");
+						ImGui::SliderInt("PoV radius", &g_Options.esp_pov_radius, 5, 100);
+					}
+
 					ImGui::Checkbox("Snaplines##ESP", &g_Options.esp_player_snaplines);
 					ImGui::Checkbox("Skelet##ESP", &g_Options.esp_player_skelet);
 					ImGui::Checkbox("Backtracked Trail##ESP", &g_Options.esp_backtracked_player_skelet);
@@ -733,10 +743,10 @@ namespace GladiatorMenu
 				ImGui::Checkbox("Grenade ESP##ESP", &g_Options.esp_grenades);
 				ImGui::Combo("Grenade ESP type##ESP", &g_Options.esp_grenades_type, opt_GrenadeESPType, 4);
 
-#ifdef NIGHTMODE
+//#ifdef NIGHTMODE
 				ImGui::Checkbox("Nightmode##ESP", &g_Options.visuals_others_nightmode);
 				ImGui::ColorPickerBox("##Picker_nightmode", g_Options.visuals_others_nightmode_color);
-#endif
+//#endif
 
 				//ImGui::Combo("Skybox##ESP", &g_Options.visuals_others_sky, opt_Skynames, 15);
 

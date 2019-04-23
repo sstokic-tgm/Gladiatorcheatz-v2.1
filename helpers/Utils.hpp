@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../features/PlayerHurt.hpp"
+
 #include <Windows.h>
 #include <string>
 #include <initializer_list>
@@ -19,6 +21,7 @@ namespace Utils
 	void RankRevealAll();
 	void IsReady();
 	bool IsDangerZone();
+	void EventLog(std::string message, Color messageColor = Color::White, bool console = true, std::string consolePrefix = "[Gladiatorcheatz] ", Color consoleColor = Color(50, 122, 239));
 	void SetClantag(const char *tag);
 	void LoadNamedSkys(const char *sky_name);
 	void RandomSeed(int iSeed);

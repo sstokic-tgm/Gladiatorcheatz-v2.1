@@ -74,6 +74,12 @@ void Config::SaveConfig(const std::string path)
 	SaveArray(g_Options.esp_player_chams_color_t, "esp_player_chams_color_t");
 	SaveArray(g_Options.esp_player_chams_color_ct, "esp_player_chams_color_ct");
 	Save(g_Options.esp_player_skelet, "esp_player_skelet");
+	Save(g_Options.esp_flags, "esp_flags");
+	Save(g_Options.esp_pov, "esp_pov");
+	SaveArray(g_Options.esp_pov_color_t_visible, "esp_pov_color_t_visible");
+	SaveArray(g_Options.esp_pov_color_ct_visible, "esp_pov_color_ct_visible");
+	SaveArray(g_Options.esp_pov_color_t, "esp_pov_color_t");
+	SaveArray(g_Options.esp_pov_color_ct, "esp_pov_color_ct");
 	Save(g_Options.esp_player_anglelines, "esp_player_anglelines");
 	Save(g_Options.esp_dropped_weapons, "esp_dropped_weapons");
 	Save(g_Options.esp_planted_c4, "esp_planted_c4");
@@ -210,6 +216,12 @@ void Config::LoadConfig(const std::string path)
 	LoadArray(g_Options.esp_player_chams_color_t, "esp_player_chams_color_t");
 	LoadArray(g_Options.esp_player_chams_color_ct, "esp_player_chams_color_ct");
 	Load(g_Options.esp_player_skelet, "esp_player_skelet");
+	Load(g_Options.esp_flags, "esp_flags");
+	Load(g_Options.esp_pov, "esp_pov");
+	LoadArray(g_Options.esp_pov_color_t_visible, "esp_pov_color_t_visible");
+	LoadArray(g_Options.esp_pov_color_ct_visible, "esp_pov_color_ct_visible");
+	LoadArray(g_Options.esp_pov_color_t, "esp_pov_color_t");
+	LoadArray(g_Options.esp_pov_color_ct, "esp_pov_color_ct");
 	Load(g_Options.esp_player_anglelines, "esp_player_anglelines");
 	Load(g_Options.esp_dropped_weapons, "esp_dropped_weapons");
 	Load(g_Options.esp_planted_c4, "esp_planted_c4");

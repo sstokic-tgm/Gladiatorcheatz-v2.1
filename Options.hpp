@@ -27,6 +27,14 @@ public:
 	OPTION(bool, esp_player_health, false);
 	OPTION(bool, esp_player_weapons, false);
 	OPTION(bool, esp_player_snaplines, false);
+	OPTION(bool, esp_flags, false);
+	OPTION(bool, esp_pov, false);
+	OPTION(int, esp_pov_radius, 5);
+	OPTION(int, esp_pov_size, 10);
+	float esp_pov_color_ct_visible[4] = { 1.f, 1.f, 1.f, 1.f };
+	float esp_pov_color_t_visible[4] = { 1.f, 1.f, 1.f, 1.f };
+	float esp_pov_color_ct[4] = { 1.f, 1.f, 1.f, 1.f };
+	float esp_pov_color_t[4] = { 1.f, 1.f, 1.f, 1.f };
 	OPTION(bool, esp_player_chams, false);
 	OPTION(int, esp_player_chams_type, 0);
 	float esp_player_chams_color_t_visible[4] = { 1.f, 1.f, 0.0f, 1.f };
@@ -67,7 +75,8 @@ public:
 	OPTION(bool, visuals_others_nightmode, false);
 	float visuals_others_nightmode_color[4] = { 0.15f, 0.15f, 0.15f, 1.f };
 #endif
-
+	OPTION(bool, visuals_others_nightmode, false);
+	float visuals_others_nightmode_color[4] = { 0.15f, 0.15f, 0.15f, 1.f };
 
 	OPTION(bool, misc_bhop, false);
 	OPTION(bool, misc_autostrafe, false);

@@ -4,12 +4,16 @@
 #include "../helpers/Math.hpp"
 #include "LagCompensation.hpp"
 
+#define FLAG_MACRO std::pair<std::string, Color> // :joy:
+#define FLAG(string, color) vecFlags.push_back(FLAG_MACRO(string, color)) //coz, why not
+
 namespace Visuals
 {
 	vgui::HFont weapon_font;
 	vgui::HFont ui_font;
 	vgui::HFont watermark_font;
 	vgui::HFont spectatorlist_font;
+	vgui::HFont log_font;
 	VisualsStruct ESP_ctx;
 	float ESP_Fade[64];
 	C_BasePlayer* local_observed;
@@ -203,6 +207,9 @@ bool Visuals::InitFont()
 	spectatorlist_font = g_VGuiSurface->CreateFont_();
 	g_VGuiSurface->SetFontGlyphSet(spectatorlist_font, "Tahoma", 14, 350, 0, 0, FONTFLAG_OUTLINE);
 
+	log_font = g_VGuiSurface->CreateFont_();
+	g_VGuiSurface->SetFontGlyphSet(log_font, "Courier new", 14, 400, 0, 0, FONTFLAG_DROPSHADOW);
+
 	return true;
 }
 
@@ -313,15 +320,19 @@ bool Visuals::Begin(C_BasePlayer *player)
 	{
 		if (ESP_ctx.isVisible)
 		{
+			ESP_ctx.clr_pov.SetColor(playerTeam ? g_Options.esp_pov_color_t_visible : g_Options.esp_pov_color_ct_visible);
 			ESP_ctx.clr_fill.SetColor(playerTeam ? g_Options.esp_player_fill_color_t_visible : g_Options.esp_player_fill_color_ct_visible);
 			ESP_ctx.clr.SetColor(playerTeam ? g_Options.esp_player_bbox_color_t_visible : g_Options.esp_player_bbox_color_ct_visible);
 		}
 		else
 		{
+			ESP_ctx.clr_pov.SetColor(playerTeam ? g_Options.esp_pov_color_t : g_Options.esp_pov_color_ct);
 			ESP_ctx.clr_fill.SetColor(playerTeam ? g_Options.esp_player_fill_color_t : g_Options.esp_player_fill_color_ct);
 			ESP_ctx.clr.SetColor(playerTeam ? g_Options.esp_player_bbox_color_t : g_Options.esp_player_bbox_color_ct);
 			ESP_ctx.clr.SetAlpha(255);
 		}
+
+		ESP_ctx.clr_pov.SetAlpha(ESP_ctx.clr_pov.a() * ESP_Fade[idx]);
 		ESP_ctx.clr.SetAlpha(ESP_ctx.clr.a() * ESP_Fade[idx]);
 		ESP_ctx.clr_fill.SetAlpha(g_Options.esp_fill_amount * ESP_Fade[idx]);
 		ESP_ctx.clr_text = Color(245, 245, 245, (int)(ESP_ctx.clr.a() * ESP_Fade[idx]));
@@ -329,6 +340,7 @@ bool Visuals::Begin(C_BasePlayer *player)
 	else
 	{
 		// Set all colors to grey if immune.
+		ESP_ctx.clr_pov.SetColor(166, 169, 174, (int)(225 * ESP_Fade[idx]));
 		ESP_ctx.clr.SetColor(166, 169, 174, (int)(225 * ESP_Fade[idx]));
 		ESP_ctx.clr_text.SetColor(166, 169, 174, (int)(225 * ESP_Fade[idx]));
 		ESP_ctx.clr_fill.SetColor(166, 169, 174, (int)(g_Options.esp_fill_amount * ESP_Fade[idx]));
@@ -485,10 +497,126 @@ void Visuals::DrawWatermark()
 	DrawString(watermark_font, 10, 10, Color(0, 153, 204, 255), FONT_LEFT, "Gladiatorcheatz v2.1: Counter-Strike: Global Offensive");
 }
 
-void Visuals::DrawResolverModes()
+void Visuals::DrawFlags() /*Not the best way to do this, tbh*/
 {
-	if (ESP_ctx.bEnemy) // on enemies only
-		DrawString(ui_font, ESP_ctx.bbox.right + 5, ESP_ctx.bbox.top, Color(255, 255, 255, 255), FONT_LEFT, Global::resolverModes[ESP_ctx.player->EntIndex()].c_str());
+	std::vector<FLAG_MACRO> vecFlags;
+
+	int alpha = ESP_ctx.clr_text.a(); // so now, this is epic
+
+	if (ESP_ctx.player->m_ArmorValue() > 0)
+		FLAG(ESP_ctx.player->GetArmorName(), Color(255, 255, 255, alpha));
+
+	if (ESP_ctx.player->m_bIsScoped())
+		FLAG("SCOPED", Color(52, 165, 207, alpha));
+
+	if (ESP_ctx.bEnemy && g_Options.hvh_resolver)
+		FLAG(Global::resolverModes[ESP_ctx.player->EntIndex()].c_str(), Color(255, 255, 255, alpha));
+
+	int offset = 0; //smh, have to think about a better way just because of this lmao
+	for (auto Text : vecFlags)
+	{
+		DrawString(ui_font, ESP_ctx.bbox.right + 4, (ESP_ctx.bbox.top + 4) + offset, Text.second, FONT_LEFT, Text.first.c_str());
+		offset += 9;
+	}
+}
+
+void Visuals::ModulateWorld()
+{
+	if (!g_LocalPlayer)
+		return;
+
+	static bool bPerformed = false;
+	static bool bLastSetting;
+	static float old_colors[4];
+
+	if (!g_EngineClient->IsInGame())
+	{
+		bPerformed = false;
+		return;
+	}
+
+	if (!bPerformed || old_colors != g_Options.visuals_others_nightmode_color)
+	{
+		for (auto i = g_MatSystem->FirstMaterial(); i != g_MatSystem->InvalidMaterial(); i = g_MatSystem->NextMaterial(i))
+		{
+			auto* pMat = g_MatSystem->GetMaterial(i);
+
+			if (!pMat)
+				continue;
+
+			if (strstr(pMat->GetTextureGroupName(), "World"))
+				pMat->ColorModulate(g_Options.visuals_others_nightmode_color[0], g_Options.visuals_others_nightmode_color[1], g_Options.visuals_others_nightmode_color[2]);
+
+			if (strstr(pMat->GetTextureGroupName(), "StaticProp"))
+				pMat->ColorModulate(g_Options.visuals_others_nightmode_color[0], g_Options.visuals_others_nightmode_color[1], g_Options.visuals_others_nightmode_color[2]);
+		}
+
+		old_colors[4] = { *g_Options.visuals_others_nightmode_color };
+
+		bPerformed = true;
+	}
+}
+
+void Visuals::DrawPoV() /*I am allowed to take this from my old cheat, for all those guys saying this is pasted...*/
+{
+	auto isOnScreen = [](Vector origin, Vector& screen) -> bool
+	{
+		if (!Math::WorldToScreen(origin, screen))
+			return false;
+
+		int iScreenWidth, iScreenHeight;
+		g_EngineClient->GetScreenSize(iScreenWidth, iScreenHeight);
+
+		bool xOk = iScreenWidth > screen.x > 0, yOk = iScreenHeight > screen.y > 0;
+		return xOk && yOk;
+	};
+
+	Vector screenPos;
+	if (isOnScreen(ESP_ctx.player->GetHitboxPos(2), screenPos)) //TODO (?): maybe a combo/checkbox to turn this on/off
+		return;
+
+	auto rotateArrow = [](std::array< Vector2D, 3 >& points, float rotation) -> void
+	{
+		const auto pointsCenter = (points.at(0) + points.at(1) + points.at(2)) / 3;
+		for (auto& point : points)
+		{
+			point -= pointsCenter;
+
+			const auto tempX = point.x;
+			const auto tempY = point.y;
+
+			const auto theta = DEG2RAD(rotation);
+			const auto c = cos(theta);
+			const auto s = sin(theta);
+
+			point.x = tempX * c - tempY * s;
+			point.y = tempX * s + tempY * c;
+
+			point += pointsCenter;
+		}
+	};
+
+	QAngle viewAngles;
+	g_EngineClient->GetViewAngles(viewAngles);
+
+	int width, height;
+	g_EngineClient->GetScreenSize(width, height);
+
+	const auto screenCenter = Vector2D(width * 0.5f, height * 0.5f);
+	const auto angleYawRad = DEG2RAD(viewAngles.yaw - Math::CalcAngle(g_LocalPlayer->GetEyePos(), ESP_ctx.player->GetHitboxPos(2)).yaw - 90);
+
+	int radius = max(10, g_Options.esp_pov_radius);
+	int size = max(5, g_Options.esp_pov_size);
+
+	const auto newPointX = screenCenter.x + ((((width - (size * 3)) * 0.5f) * (radius / 100.f)) * cos(angleYawRad)) + (int)(6.0f * (((float)size - 4.f) / 16.0f)); //c-style casting, sorry.
+	const auto newPointY = screenCenter.y + ((((height - (size * 3)) * 0.5f) * (radius / 100.f)) * sin(angleYawRad));
+
+	std::array<Vector2D, 3> points{ Vector2D(newPointX - size, newPointY - size), Vector2D(newPointX + size, newPointY), Vector2D(newPointX - size, newPointY + size) };
+
+	/*first rotate the arrow, then draw it..*/
+	rotateArrow(points, viewAngles.yaw - Math::CalcAngle(g_LocalPlayer->GetEyePos(), ESP_ctx.player->GetHitboxPos(2)).yaw - 90);
+
+	DrawFilledTriangle(points, ESP_ctx.clr_pov);
 }
 
 void Visuals::DrawCapsuleOverlay(int idx, float duration)
@@ -602,7 +730,7 @@ void Visuals::RenderWeapon()
 
 	if (weapon->m_hOwnerEntity().IsValid())
 	{
-		auto name = clean_item_name(weapon->GetClientClass()->m_pNetworkName);
+		auto name = clean_item_name(weapon->GetClientClass()->m_pNetworkName); //TODO: use localised hudname instead of this...
 
 		if (MultiByteToWideChar(CP_UTF8, 0, name, -1, buf, 80) > 0)
 		{
@@ -856,6 +984,12 @@ void Visuals::Polygon(int count, Vertex_t* Vertexs, Color color)
 	g_VGuiSurface->DrawSetTexture(Texture);
 
 	g_VGuiSurface->DrawTexturedPolygon(count, Vertexs);
+}
+
+void Visuals::DrawFilledTriangle(std::array<Vector2D, 3> points, Color color)
+{
+	std::array<Vertex_t, 3> vertices{ Vertex_t(points.at(0)), Vertex_t(points.at(1)), Vertex_t(points.at(2)) };
+	Polygon(3, vertices.data(), color);
 }
 
 void Visuals::PolygonOutline(int count, Vertex_t* Vertexs, Color color, Color colorLine)

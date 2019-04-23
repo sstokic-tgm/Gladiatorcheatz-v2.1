@@ -6,6 +6,8 @@
 
 #include "../Options.hpp"
 
+#include <algorithm>
+
 void PlayerHurtEvent::FireGameEvent(IGameEvent *event)
 {
 	if (!g_LocalPlayer || !event)
@@ -58,7 +60,6 @@ void PlayerHurtEvent::FireGameEvent(IGameEvent *event)
 			return "generic";
 		};
 
-		EventInfo info;
 		std::stringstream msg;
 
 		auto enemy = event->GetInt("userid");
@@ -80,25 +81,16 @@ void PlayerHurtEvent::FireGameEvent(IGameEvent *event)
 			if (attacker_index != g_EngineClient->GetLocalPlayer())
 				return;
 
-			info.m_flExpTime = g_GlobalVars->curtime + 4.f;
 			std::string szHitgroup = HitgroupToString(hitgroup);
+
 			msg << "Hit " << enemy_info.szName << " in the " << szHitgroup << " for " << dmg_to_health << " dmg " << "(" << remaining_health << " health remaining)";
-			info.m_szMessage = msg.str();
 
-			eventInfo.emplace_back(info);
-
-			g_CVar->ConsoleColorPrintf(Color(50, 122, 239), "[Gladiatorcheatz]");
-			g_CVar->ConsoleDPrintf(" ""Hit"" ");
-			g_CVar->ConsoleColorPrintf(Color(255, 255, 255), "%s", enemy_info.szName);
-			g_CVar->ConsoleColorPrintf(Color(255, 255, 255), " in the %s", szHitgroup.c_str());
-			g_CVar->ConsoleDPrintf(" ""for"" ");
-			g_CVar->ConsoleColorPrintf(Color(255, 255, 255), "%s dmg", dmg_to_health);
-			g_CVar->ConsoleColorPrintf(Color(255, 255, 255), " (%s health remaining)\n", remaining_health);
+			Utils::EventLog(msg.str());
 		}
 	}
 	else
-		if (eventInfo.size() > 0)
-			eventInfo.clear();
+		if (eventLog.size() > 0)
+			eventLog.clear();
 
 	if (g_Options.hvh_resolver)
 	{
@@ -162,10 +154,8 @@ void PlayerHurtEvent::Paint(void)
 	if (width == 0 || height == 0)
 		g_EngineClient->GetScreenSize(width, height);
 
-	RECT scrn = Visuals::GetViewport();
-
-	if (eventInfo.size() > 15)
-		eventInfo.erase(eventInfo.begin() + 1);
+	if (eventLog.size() > 6)
+		eventLog.erase(eventLog.begin() + 1);
 
 	float alpha = 0.f;
 
@@ -200,18 +190,40 @@ void PlayerHurtEvent::Paint(void)
 
 	if (g_Options.misc_logevents)
 	{
-		for (size_t i = 0; i < eventInfo.size(); i++)
+		int x = 8, y = 7;
+
+		for (size_t i = 0; i < eventLog.size(); ++i) // valve code at it's finest (lmao) https://github.com/VSES/SourceEngine2007/blob/master/se2007/engine/console.cpp#L978-L1010
 		{
-			float diff = eventInfo[i].m_flExpTime - g_GlobalVars->curtime;
-			if (eventInfo[i].m_flExpTime < g_GlobalVars->curtime)
+			eventLog[i].m_flTime -= g_GlobalVars->frametime;
+
+			int fontTall = g_VGuiSurface->GetFontTall(Visuals::log_font) + 1;
+
+			if (eventLog[i].m_flTime < .5f)
 			{
-				eventInfo.erase(eventInfo.begin() + i);
-				continue;
+				float f = std::clamp(eventLog[i].m_flTime, 0.0f, .5f) / .5f;
+
+				if (i == 0)
+				{
+					eventLog[i].m_Color.SetAlpha((int)(f * 255.0f));
+
+					if (f < 0.2f)
+					{
+						y -= fontTall * (1.0f - f / 0.2f) - 2;
+					}
+				}
+			}
+			else
+			{
+				eventLog[i].m_Color.SetAlpha(255);
 			}
 
-			alpha = 0.8f - diff / 0.8f;
+			if (i == 0 && eventLog[i].m_Color.a() <= .1f)
+			{
+				eventLog.erase(eventLog.begin() + i);
+				eventLog[i].m_flTime = 0.75f;
+			}
 
-			Visuals::DrawString(5, 5, (scrn.top + 13) + (9.5 * i), Color(255, 255, 255), FONT_LEFT, eventInfo[i].m_szMessage.c_str());
+			Visuals::DrawString(Visuals::log_font, x, y + (i * 16), eventLog[i].m_Color, FONT_LEFT, eventLog[i].m_Text.c_str());
 		}
 	}
 }

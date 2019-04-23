@@ -18,6 +18,7 @@ namespace Visuals
 		Color clr;
 		Color clr_text;
 		Color clr_fill;
+		Color clr_pov;
 		Vector head_pos;
 		Vector feet_pos;
 		RECT bbox;
@@ -32,6 +33,7 @@ namespace Visuals
 	extern unsigned long ui_font;
 	extern unsigned long watermark_font;
 	extern unsigned long spectatorlist_font;
+	extern unsigned long log_font;
 
 	bool Begin(C_BasePlayer *player);
 	bool ValidPlayer(C_BasePlayer *player, bool = true);
@@ -51,7 +53,9 @@ namespace Visuals
 	void RenderSpectatorList();
 	void DrawAngleLines();
 	void DrawWatermark();
-	void DrawResolverModes();
+	void DrawFlags();
+	void ModulateWorld();
+	void DrawPoV();
 	void DrawCapsuleOverlay(int idx, float duration);
 	bool InitFont();
 
@@ -59,6 +63,7 @@ namespace Visuals
 
 	void Draw3DCube(float scalar, QAngle angles, Vector middle_origin, Color outline);
 	void Polygon(int count, Vertex_t* Vertexs, Color color);
+	void DrawFilledTriangle(std::array<Vector2D, 3> points, Color color);
 	void PolygonOutline(int count, Vertex_t* Vertexs, Color color, Color colorLine);
 	void PolyLine(int count, Vertex_t* Vertexs, Color colorLine);
 	void PolyLine(int *x, int *y, int count, Color color);
