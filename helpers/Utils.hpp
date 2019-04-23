@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../features/PlayerHurt.hpp"
+#include "../features/Logger.hpp"
 
 #include <Windows.h>
 #include <string>

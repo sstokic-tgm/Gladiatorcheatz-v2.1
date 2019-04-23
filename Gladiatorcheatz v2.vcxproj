@@ -161,6 +161,7 @@
     <ClInclude Include="features\Glow.hpp" />
     <ClInclude Include="features\GrenadePrediction.h" />
     <ClInclude Include="features\KitParser.hpp" />
+    <ClInclude Include="features\Logger.hpp" />
     <ClInclude Include="features\PlayerHurt.hpp" />
     <ClInclude Include="features\LagCompensation.hpp" />
     <ClInclude Include="features\Miscellaneous.hpp" />
@@ -261,6 +262,7 @@
     <ClCompile Include="features\Glow.cpp" />
     <ClCompile Include="features\GrenadePrediction.cpp" />
     <ClCompile Include="features\KitParser.cpp" />
+    <ClCompile Include="features\Logger.cpp" />
     <ClCompile Include="features\PlayerHurt.cpp" />
     <ClCompile Include="features\LagCompensation.cpp" />
     <ClCompile Include="features\Miscellaneous.cpp" />
