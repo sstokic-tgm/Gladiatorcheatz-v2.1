@@ -275,7 +275,7 @@ namespace Utils
 
 	void EventLog(std::string message, Color messageColor, bool console, std::string consolePrefix, Color consoleColor)
 	{
-		PlayerHurtEvent::Get().eventLog.push_back(MessageInfo(message, messageColor));
+		Logger::Get().add(message, messageColor);
 
 		if (console)
 		{

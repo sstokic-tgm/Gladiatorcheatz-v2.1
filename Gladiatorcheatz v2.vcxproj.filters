@@ -351,6 +351,9 @@
     <ClInclude Include="features\Animation.hpp">
       <Filter>Headerdateien\features</Filter>
     </ClInclude>
+    <ClInclude Include="features\Logger.hpp">
+      <Filter>Headerdateien\features</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="imgui\DX9\imgui_impl_dx9.cpp">
@@ -474,6 +477,9 @@
       <Filter>Quelldateien\features</Filter>
     </ClCompile>
     <ClCompile Include="features\Animation.cpp">
+      <Filter>Quelldateien\features</Filter>
+    </ClCompile>
+    <ClCompile Include="features\Logger.cpp">
       <Filter>Quelldateien\features</Filter>
     </ClCompile>
   </ItemGroup>

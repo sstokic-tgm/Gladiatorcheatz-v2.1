@@ -227,6 +227,8 @@ void __fastcall Handlers::PaintTraverse_h(void *thisptr, void*, unsigned int vgu
 
 		if (g_Options.visuals_others_watermark)
 			Visuals::DrawWatermark();
+
+		Logger::Get().Paint();
 	}
 }
 
