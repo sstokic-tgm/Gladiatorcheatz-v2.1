@@ -10,7 +10,7 @@ bool C_BaseEntity::IsPlayer()
 	//index: 152
 	//ref: "effects/nightvision"
 	//sig: 8B 92 ? ? ? ? FF D2 84 C0 0F 45 F7 85 F6
-	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 153)(this);
+	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 155)(this);
 }
 
 bool C_BaseEntity::IsWeapon()
@@ -18,7 +18,7 @@ bool C_BaseEntity::IsWeapon()
 	//index: 160
 	//ref: "CNewParticleEffect::DrawModel"
 	//sig: 8B 80 ? ? ? ? FF D0 84 C0 74 6F 8B 4D A4
-	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 161)(this);
+	return VT::vfunc<bool(__thiscall*)(C_BaseEntity*)>(this, 163)(this);
 }
 
 bool C_BaseEntity::IsPlantedC4()
@@ -42,7 +42,7 @@ WeapInfo_t *C_BaseCombatWeapon::GetWeapInfo()
 		return NULL;
 
 	typedef WeapInfo_t *(__thiscall *o_getWeapInfo)(void*);
-	return VT::vfunc<o_getWeapInfo>(this, 448)(this);
+	return VT::vfunc<o_getWeapInfo>(this, 454)(this);
 }
 
 bool C_BaseCombatWeapon::HasBullets()
@@ -121,17 +121,17 @@ bool C_BaseCombatWeapon::IsGrenade()
 
 float C_BaseCombatWeapon::GetInaccuracy()
 {
-	return VT::vfunc<float(__thiscall*)(void*)>(this, 471)(this);
+	return VT::vfunc<float(__thiscall*)(void*)>(this, 476)(this);
 }
 
 float C_BaseCombatWeapon::GetSpread()
 {
-	return VT::vfunc<float(__thiscall*)(void*)>(this, 440)(this);
+	return VT::vfunc<float(__thiscall*)(void*)>(this, 446)(this);
 }
 
 void C_BaseCombatWeapon::UpdateAccuracyPenalty()
 {
-	VT::vfunc<void(__thiscall*)(void*)>(this, 472)(this);
+	VT::vfunc<void(__thiscall*)(void*)>(this, 477)(this);
 }
 
 bool C_BaseCombatWeapon::IsWeaponNonAim()
@@ -679,7 +679,7 @@ void C_BasePlayer::SetAbsAngles(const QAngle &angles)
 void C_BasePlayer::UpdateClientSideAnimation()
 {
 	typedef void(__thiscall *o_updateClientSideAnimation)(void*);
-	VT::vfunc<o_updateClientSideAnimation>(this, 219)(this);
+	VT::vfunc<o_updateClientSideAnimation>(this, 221)(this);
 }
 
 int C_BasePlayer::GetPing()
