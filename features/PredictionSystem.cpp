@@ -15,11 +15,14 @@ void PredictionSystem::Start(CUserCmd *userCMD, C_BasePlayer* player)
 
 	//Here we're doing CBasePlayer::UpdateButtonState // NOTE: hard to tell when offsets changed, think of more longterm solution or just dont do this.
 	moveData.m_nButtons = userCMD->buttons;
-	int buttonsChanged = userCMD->buttons ^ *reinterpret_cast<int*>(uintptr_t(player) + 0x31E8);
-	*reinterpret_cast<int*>(uintptr_t(player) + 0x31DC) = (uintptr_t(player) + 0x31E8);
-	*reinterpret_cast<int*>(uintptr_t(player) + 0x31E8) = userCMD->buttons;
-	*reinterpret_cast<int*>(uintptr_t(player) + 0x31E0) = userCMD->buttons & buttonsChanged;  //m_afButtonPressed ~ The changed ones still down are "pressed"
-	*reinterpret_cast<int*>(uintptr_t(player) + 0x31E4) = buttonsChanged & ~userCMD->buttons; //m_afButtonReleased ~ The ones not down are "released"
+	int buttonsChanged = userCMD->buttons ^ *reinterpret_cast<int*>(uintptr_t(player) + 0x31F8);
+	*reinterpret_cast<int*>(uintptr_t(player) + 0x31EC) = (uintptr_t(player) + 0x31F8);
+	*reinterpret_cast<int*>(uintptr_t(player) + 0x31F8) = userCMD->buttons;
+	*reinterpret_cast<int*>(uintptr_t(player) + 0x31F0) = userCMD->buttons & buttonsChanged;  //m_afButtonPressed ~ The changed ones still down are "pressed"
+	*reinterpret_cast<int*>(uintptr_t(player) + 0x31F4) = buttonsChanged & ~userCMD->buttons; //m_afButtonReleased ~ The ones not down are "released"
+	
+	if (m_pcmd->m_impulse)
+		*reinterpret_cast<uint32_t*>(uint32_t(g_ctx.local()) + m_nImpulse) = m_pcmd->m_impulse;
 
 	g_GameMovement->StartTrackPredictionErrors(player);
 
